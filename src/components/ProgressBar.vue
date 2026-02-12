@@ -47,6 +47,7 @@ defineProps({
   height: 8px;
   background-color: #e0e0e0;
   border-radius: 5px;
+  border-style: hidden;
   overflow: hidden;
 }
 
