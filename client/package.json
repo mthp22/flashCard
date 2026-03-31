@@ -17,8 +17,12 @@
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
-    "fs": "^0.0.1-security",
-    "path": "^0.12.7",
+    "@fortawesome/fontawesome-free": "^6.5.1",
+    "bootstrap": "^5.3.2",
+    "firebase": "^12.9.0",
+    "framer-motion": "^10.16.16",
+    "highlight.js": "^11.9.0",
+    "motion": "^10.16.16",
     "pinia": "^3.0.4",
     "vue": "^3.5.27",
     "vue-router": "^5.0.1"
