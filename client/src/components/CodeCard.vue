@@ -152,7 +152,7 @@ onBeforeUnmount(() => {
   border-radius: 2px;
   box-shadow:
     0 1px 0 var(--rule),
-    0 12px 28px rgba(42, 37, 29, 0.18);
+    0 12px 28px rgba(36, 31, 23, 0.18);
 }
 
 :root[data-theme='dark'] .code-card {

@@ -15,21 +15,22 @@
 
 /* ------------------------------------------------------------
    Tokens — daylight (default)
+   Manila desk, bright card stock, oxblood stamp ink
    ------------------------------------------------------------ */
 :root {
   /* Paper & ink */
-  --bg: #e8dfc9; /* desk */
-  --surface: #faf5e9; /* card stock */
-  --surface-2: #f1e9d6; /* insets, header strips */
-  --ink: #2a251d; /* warm near-black */
-  --ink-soft: #6f6455; /* annotations */
-  --rule: #d8cbae; /* ruled lines, hairlines */
+  --bg: #ddd2b8; /* manila desk blotter */
+  --surface: #fbf7ec; /* bright card stock */
+  --surface-2: #efe7d2; /* kraft slips, header strips */
+  --ink: #241f17; /* warm near-black */
+  --ink-soft: #6b6154; /* annotations */
+  --rule: #c9bda0; /* ruled lines, hairlines */
 
   /* Ink colors */
-  --accent: #b03a2e; /* index-card red */
-  --primary-dark: #8c2d23;
-  --green: #2f6e4e; /* MASTERED stamp */
-  --amber: #92610f;
+  --accent: #9c2f24; /* oxblood stamp ink */
+  --primary-dark: #7c241b;
+  --green: #2f6a4d; /* MASTERED stamp pad */
+  --amber: #a06f1e; /* aged brass */
   --brass: #a8873c; /* drawer hardware */
   --drawer: #4a3f30; /* drawer front */
   --drawer-ink: #ece2cc; /* typed labels on drawers */
@@ -52,29 +53,36 @@
     sans-serif;
 
   /* Paper lift — flat, no neon glows */
-  --lift: 0 1px 0 var(--rule), 0 2px 10px rgba(42, 37, 29, 0.1);
+  --lift: 0 1px 0 var(--rule), 0 2px 10px rgba(36, 31, 23, 0.1);
 }
 
 /* ------------------------------------------------------------
-   Tokens — dim (late-night desk lamp off)
+   Tokens — dim (late-night desk, lamp on low)
+   Warm charcoal + parchment; accents lift to hold presence
    ------------------------------------------------------------ */
 :root[data-theme='dark'] {
-  --bg: #211c15;
-  --surface: #2c261d;
-  --surface-2: #262019;
-  --ink: #d9cfb8;
-  --ink-soft: #9a8d75;
-  --rule: #493f2f;
+  --bg: #191512;
+  --surface: #241f1a;
+  --surface-2: #201b16;
+  --ink: #e6dcc6;
+  --ink-soft: #a89a84;
+  --rule: #3a3229;
 
-  --accent: #c96555;
-  --primary-dark: #b05142;
-  --green: #7fa88b;
-  --amber: #c29a52;
-  --brass: #c2a35b;
-  --drawer: #17130e;
-  --drawer-ink: #d9cfb8;
+  --accent: #d2604f;
+  --primary-dark: #b8503f;
+  --green: #7fae8e;
+  --amber: #d2a04f;
+  --brass: #c9a95f;
+  --drawer: #12100c;
+  --drawer-ink: #e6dcc6;
 
   --lift: 0 1px 0 rgba(0, 0, 0, 0.35), 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* A faint pool of lamplight over the desk in dim mode */
+:root[data-theme='dark'] body {
+  background:
+    radial-gradient(1200px 480px at 50% -8%, rgba(210, 160, 79, 0.07), transparent 62%), var(--bg);
 }
 
 /* ------------------------------------------------------------

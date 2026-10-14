@@ -316,7 +316,7 @@ onBeforeUnmount(() => {
   transform: rotate(-2deg);
   box-shadow:
     0 1px 0 var(--rule),
-    0 14px 30px rgba(42, 37, 29, 0.22);
+    0 14px 30px rgba(36, 31, 23, 0.22);
   transition: border-color 0.2s ease;
 }
 
@@ -480,7 +480,7 @@ onBeforeUnmount(() => {
 
 .category-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(42, 37, 29, 0.28);
+  box-shadow: 0 12px 24px rgba(36, 31, 23, 0.28);
 }
 
 .drawer-face {
