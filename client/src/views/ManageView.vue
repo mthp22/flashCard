@@ -4,11 +4,13 @@
 
     <main class="container py-5">
       <!-- Header -->
-      <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+      <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
         <div>
-          <h1 class="mb-1"><i class="fas fa-layer-group text-accent"></i> Manage Cards</h1>
+          <p class="serial mb-2">CATALOG · CARDS ON FILE</p>
+          <h1 class="mb-1">The catalog</h1>
           <p class="text-muted mb-0">
-            {{ filteredCards.length }} of {{ cards.cards.length }} cards shown
+            {{ filteredCards.length }} of {{ cards.cards.length }} cards shown · changes live in
+            this tab only
           </p>
         </div>
         <div class="d-flex gap-2 flex-wrap">
@@ -17,24 +19,25 @@
             class="form-select w-auto"
             aria-label="Filter by category"
           >
-            <option value="all">All categories</option>
+            <option value="all">All drawers</option>
             <option
               v-for="category in cards.categoriesWithCount"
               :key="category.id"
               :value="category.id"
             >
-              {{ category.icon }} {{ category.name }} ({{ category.cardCount }})
+              {{ category.name }} ({{ category.cardCount }})
             </option>
           </select>
           <button class="btn btn-primary" @click="openCreate">
-            <i class="fas fa-plus"></i> New Card
+            <i class="fas fa-plus" aria-hidden="true"></i> Add a card
           </button>
         </div>
       </div>
 
       <!-- Card list -->
       <TransitionGroup tag="div" name="card-row" class="card-list" v-if="filteredCards.length">
-        <div v-for="card in filteredCards" :key="card.id" class="card-row">
+        <div v-for="(card, index) in filteredCards" :key="card.id" class="card-row">
+          <span class="row-serial serial">No. {{ String(index + 1).padStart(3, '0') }}</span>
           <div class="card-row-main">
             <p class="card-question mb-1">{{ card.question }}</p>
             <div class="card-meta">
@@ -47,11 +50,18 @@
                 {{ card.attemptCount }} attempts ·
                 {{
                   card.attemptCount ? Math.round((card.correctCount / card.attemptCount) * 100) : 0
-                }}% ·
-                <span :class="card.mastered ? 'text-success' : 'text-muted'">
-                  {{ card.mastered ? 'mastered' : card.needsReview ? 'review' : 'new' }}
-                </span>
+                }}%
               </small>
+              <span
+                class="stamp stamp-xs"
+                :class="{
+                  'stamp--green': card.mastered,
+                  'stamp--red': !card.mastered && card.needsReview,
+                  'stamp--faint': !card.mastered && !card.needsReview,
+                }"
+              >
+                {{ card.mastered ? 'mastered' : card.needsReview ? 'review' : 'unmarked' }}
+              </span>
             </div>
           </div>
 
@@ -61,14 +71,14 @@
               :aria-label="`Edit ${card.question}`"
               @click="openEdit(card)"
             >
-              <i class="fas fa-pen"></i>
+              <i class="fas fa-pen" aria-hidden="true"></i>
             </button>
             <button
               class="btn btn-sm btn-outline-danger"
               :aria-label="`Delete ${card.question}`"
               @click="removeCard(card.id)"
             >
-              <i class="fas fa-trash"></i>
+              <i class="fas fa-trash" aria-hidden="true"></i>
             </button>
           </div>
         </div>
@@ -76,11 +86,11 @@
 
       <!-- Empty state -->
       <div v-else class="empty-state text-center py-5">
-        <div class="display-1 mb-3">🗂️</div>
-        <h3>No Cards Here</h3>
-        <p class="text-muted">Create one to get started</p>
+        <p class="serial mb-2">EMPTY DRAWER</p>
+        <h3>Nothing filed here</h3>
+        <p class="text-muted">Add a card and it joins the drawer immediately.</p>
         <button class="btn btn-primary" @click="openCreate">
-          <i class="fas fa-plus"></i> New Card
+          <i class="fas fa-plus" aria-hidden="true"></i> Add a card
         </button>
       </div>
     </main>
@@ -121,7 +131,7 @@ const categoryLabel = (categoryId: string) =>
 const difficultyBadge = (difficulty: Difficulty) =>
   ({
     easy: 'bg-success',
-    medium: 'bg-warning text-dark',
+    medium: 'bg-warning',
     hard: 'bg-danger',
   })[difficulty]
 
@@ -178,30 +188,42 @@ h1 {
   gap: 0.75rem;
 }
 
+/* Rows as filed label slips */
 .card-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
   padding: 1rem 1.25rem;
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-  border: 1px solid var(--border);
+  background: var(--surface);
+  border: 1px solid var(--rule);
   border-left: 3px solid var(--accent);
-  border-radius: 8px;
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+  border-radius: 2px;
+  transition: border-color 0.2s ease;
 }
 
 .card-row:hover {
   border-color: var(--accent);
-  box-shadow: 0 8px 24px rgba(0, 212, 255, 0.12);
+}
+
+.row-serial {
+  flex-shrink: 0;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  letter-spacing: 2px;
+  border-right: 1px dashed var(--rule);
+  padding-right: 0.65rem;
+}
+
+.card-row-main {
+  flex: 1;
+  min-width: 0;
 }
 
 .card-question {
   font-family: var(--font-mono);
-  font-weight: 600;
-  color: var(--code-text);
+  font-weight: 700;
+  color: var(--ink);
 }
 
 .card-meta {
@@ -213,6 +235,15 @@ h1 {
   font-size: 0.75rem;
 }
 
+/* status stamps, small enough for a row */
+.stamp-xs {
+  font-size: 0.62rem;
+  letter-spacing: 1.5px;
+  padding: 0.1rem 0.4rem;
+  border-width: 1.5px;
+  transform: rotate(-2deg);
+}
+
 .card-row-actions {
   display: flex;
   gap: 0.5rem;
@@ -220,9 +251,13 @@ h1 {
 }
 
 .empty-state {
-  border: 2px dashed var(--border);
-  border-radius: 12px;
-  background: rgba(0, 212, 255, 0.05);
+  border: 2px dashed var(--rule);
+  border-radius: 3px;
+  background: var(--surface-2);
+}
+
+.empty-state h3 {
+  font-size: 1.3rem;
 }
 
 /* TransitionGroup: rows slide into place, fade out on delete */
@@ -254,6 +289,15 @@ h1 {
   .card-row {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .row-serial {
+    writing-mode: horizontal-tb;
+    transform: none;
+    border-right: none;
+    border-bottom: 1px dashed var(--rule);
+    padding: 0 0 0.4rem 0;
+    margin-bottom: 0.4rem;
   }
 
   .card-row-actions {

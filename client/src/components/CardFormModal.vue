@@ -12,11 +12,11 @@
         >
           <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0 text-accent">
-              <i :class="card ? 'fas fa-pen' : 'fas fa-plus'"></i>
+              <i :class="card ? 'fas fa-pen' : 'fas fa-plus'" aria-hidden="true"></i>
               {{ card ? 'Edit Card' : 'New Card' }}
             </h5>
             <button class="btn btn-sm btn-outline-light" aria-label="Close" @click="close">
-              <i class="fas fa-times"></i>
+              <i class="fas fa-times" aria-hidden="true"></i>
             </button>
           </div>
 
@@ -62,7 +62,7 @@
                 >
                   <option value="" disabled>Select…</option>
                   <option v-for="category in categories" :key="category.id" :value="category.id">
-                    {{ category.icon }} {{ category.name }}
+                    {{ category.name }}
                   </option>
                 </select>
                 <div v-if="errors.category" class="invalid-feedback d-block">
@@ -210,8 +210,9 @@ watch(
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(2, 6, 23, 0.75);
-  backdrop-filter: blur(4px);
+  /* a warm ink wash, like the desk lamp turned down */
+  background: rgba(34, 29, 22, 0.72);
+  backdrop-filter: blur(2px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -219,25 +220,27 @@ watch(
   z-index: 1050;
 }
 
+/* A blank card pulled from the drawer, ready to type on */
 .card-modal {
   width: 100%;
   max-width: 640px;
   max-height: 90vh;
   overflow-y: auto;
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-  border: 2px solid var(--accent);
-  border-radius: 12px;
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-top: 3px solid var(--accent);
+  border-radius: 2px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
 }
 
 .card-modal .card-header {
-  padding: 1.25rem 1.5rem;
-  border-bottom: 2px solid var(--border);
+  padding: 1.25rem 1.5rem 1rem;
+  border-bottom: 3px double var(--rule);
 }
 
 .card-modal .card-body {
   padding: 1.5rem;
-  color: var(--code-text);
+  color: var(--ink);
 }
 
 .form-label {
@@ -245,7 +248,7 @@ watch(
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: var(--accent);
+  color: var(--ink-soft);
 }
 
 .form-control,

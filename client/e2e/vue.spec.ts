@@ -2,13 +2,16 @@ import { test, expect } from '@playwright/test'
 
 test('visits the home page and shows the hero', async ({ page }) => {
   await page.goto('/')
-  await expect(page.locator('h1')).toContainText('Master Technical Interviews')
-  await expect(page.getByRole('link', { name: /Start Studying/i })).toBeVisible()
+  await expect(page.locator('h1')).toContainText(/drawer of \d+ interview cards/)
+  await expect(page.getByRole('link', { name: /Open the drawer/i }).first()).toBeVisible()
 })
 
 test('navigates to the study view and shows a flashcard', async ({ page }) => {
   await page.goto('/')
-  await page.getByRole('link', { name: /Start Studying/i }).click()
+  await page
+    .getByRole('link', { name: /Open the drawer/i })
+    .first()
+    .click()
   await expect(page.locator('.code-card')).toBeVisible()
 
   const counter = page.locator('.navigation .btn-secondary')
@@ -36,10 +39,26 @@ test('animates the progress bar', async ({ page }) => {
   await expect.poll(async () => bar.evaluate((el) => (el as HTMLElement).style.width)).not.toBe('')
 })
 
-test('toggles the light theme', async ({ page }) => {
+test('reveals every section when scrolling to the bottom', async ({ page }) => {
   await page.goto('/')
-  await page.locator('button[title]').click()
+  const height = await page.evaluate(() => document.documentElement.scrollHeight)
+  for (let y = 0; y < height; y += 500) {
+    await page.evaluate((pos) => window.scrollTo(0, pos), y)
+    await page.waitForTimeout(80)
+  }
+  // the last sections must actually reveal (opacity, not just layout)
+  const drawers = page.locator('.section-title', { hasText: 'The drawers' })
+  const colophon = page.locator('.colophon-section .reveal-item').first()
+  await expect.poll(async () => drawers.evaluate((el) => getComputedStyle(el).opacity)).toBe('1')
+  await expect.poll(async () => colophon.evaluate((el) => getComputedStyle(el).opacity)).toBe('1')
+})
+
+test('toggles between paper and dim themes', async ({ page }) => {
+  await page.goto('/')
+  // paper is the default
   await expect.poll(() => page.evaluate(() => document.documentElement.dataset.theme)).toBe('light')
+  await page.locator('button[title]').click()
+  await expect.poll(() => page.evaluate(() => document.documentElement.dataset.theme)).toBe('dark')
 })
 
 test('creates and deletes a card', async ({ page }) => {
@@ -49,7 +68,7 @@ test('creates and deletes a card', async ({ page }) => {
   const before = await page.locator('.card-row').count()
 
   await page
-    .getByRole('button', { name: /New Card/i })
+    .getByRole('button', { name: /Add a card/i })
     .first()
     .click()
   const dialog = page.getByRole('dialog')
@@ -72,10 +91,10 @@ test('creates and deletes a card', async ({ page }) => {
 
 test('manage view lists cards and opens the create modal', async ({ page }) => {
   await page.goto('/manage')
-  await expect(page.getByRole('heading', { name: /Manage Cards/i })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /The catalog/i })).toBeVisible()
 
   await page
-    .getByRole('button', { name: /New Card/i })
+    .getByRole('button', { name: /Add a card/i })
     .first()
     .click()
   await expect(page.getByRole('dialog')).toBeVisible()

@@ -2,7 +2,8 @@
   <div class="card progress-card fade-in">
     <div class="card-body">
       <h6 class="card-title mb-4">
-        <i class="fas fa-chart-line text-accent"></i> Progress Snapshot
+        <i class="fas fa-book" aria-hidden="true"></i> Session ledger
+        <span class="serial float-end">DESK 01</span>
       </h6>
 
       <div class="row g-3">
@@ -56,13 +57,13 @@
       <!-- Review & Remaining -->
       <div class="row g-2 mt-3 small">
         <div class="col-6">
-          <span class="badge bg-warning text-dark w-100">
-            <i class="fas fa-repeat"></i> {{ reviewing }} Reviewing
+          <span class="badge bg-warning w-100">
+            <i class="fas fa-redo" aria-hidden="true"></i> {{ reviewing }} flagged for review
           </span>
         </div>
         <div class="col-6">
           <span class="badge bg-secondary w-100">
-            <i class="fas fa-hourglass"></i> {{ remaining }} Remaining
+            <i class="fas fa-hourglass-half" aria-hidden="true"></i> {{ remaining }} not yet marked
           </span>
         </div>
       </div>
@@ -125,12 +126,25 @@ watch(progress, () => animateBar())
 
 <style scoped>
 .progress-card {
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  background: var(--surface);
+  border-top: 3px solid var(--accent);
+}
+
+.card-title {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .stat-item {
   text-align: center;
   padding: 1rem 0;
+  border-right: 1px dashed var(--rule);
+}
+
+.stat-item:last-child {
+  border-right: none;
 }
 
 .stat-value {
@@ -143,26 +157,32 @@ watch(progress, () => animateBar())
 
 .stat-label {
   display: block;
-  font-size: 0.8rem;
-  color: #cbd5e1;
+  font-size: 0.72rem;
+  color: var(--ink-soft);
   font-family: var(--font-mono);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
 }
 
 .badge {
   font-family: var(--font-mono);
-  font-weight: 600;
+  font-weight: 700;
   padding: 0.5rem;
 }
 
 @media (max-width: 768px) {
+  .stat-item {
+    border-right: none;
+    border-bottom: 1px dashed var(--rule);
+    padding: 0.75rem 0;
+  }
+
   .stat-value {
     font-size: 1.2rem;
   }
 
   .stat-label {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
   }
 }
 </style>

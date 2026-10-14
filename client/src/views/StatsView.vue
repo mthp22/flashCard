@@ -6,10 +6,12 @@
       <!-- Header -->
       <div class="row mb-5">
         <div class="col-12">
-          <h1 class="display-5 fw-bold mb-4">
-            <i class="fas fa-chart-bar text-accent"></i> Statistics Dashboard
-          </h1>
-          <p class="lead text-muted">Track your learning progress and performance metrics</p>
+          <p class="serial mb-2">SHEET 03 · KEPT BY HAND</p>
+          <h1 class="display-5 fw-bold mb-4">The ledger</h1>
+          <p class="lead text-muted">
+            Your marks, times and streaks. All of it is written in this tab only — reload and the
+            ledger goes blank.
+          </p>
         </div>
       </div>
 
@@ -20,12 +22,11 @@
             <div class="card-body">
               <div class="d-flex justify-content-between align-items-start">
                 <div>
-                  <p class="text-muted small mb-2"><i class="fas fa-book"></i> CARDS STUDIED</p>
+                  <p class="stat-caption mb-2">CARDS STUDIED</p>
                   <h3 class="text-accent mb-0">
                     <AnimatedNumber :value="stats.totalCardsStudied" />
                   </h3>
                 </div>
-                <i class="fas fa-book-open fa-2x text-accent opacity-50"></i>
               </div>
             </div>
           </div>
@@ -36,12 +37,11 @@
             <div class="card-body">
               <div class="d-flex justify-content-between align-items-start">
                 <div>
-                  <p class="text-muted small mb-2"><i class="fas fa-star"></i> CARDS MASTERED</p>
+                  <p class="stat-caption mb-2">CARDS MASTERED</p>
                   <h3 class="text-success mb-0">
                     <AnimatedNumber :value="stats.totalCardsMastered" />
                   </h3>
                 </div>
-                <i class="fas fa-trophy fa-2x text-success opacity-50"></i>
               </div>
             </div>
           </div>
@@ -52,10 +52,9 @@
             <div class="card-body">
               <div class="d-flex justify-content-between align-items-start">
                 <div>
-                  <p class="text-muted small mb-2"><i class="fas fa-target"></i> ACCURACY</p>
+                  <p class="stat-caption mb-2">ACCURACY</p>
                   <h3 class="text-accent mb-0"><AnimatedNumber :value="accuracyPercent" />%</h3>
                 </div>
-                <i class="fas fa-bullseye fa-2x text-accent opacity-50"></i>
               </div>
             </div>
           </div>
@@ -66,12 +65,11 @@
             <div class="card-body">
               <div class="d-flex justify-content-between align-items-start">
                 <div>
-                  <p class="text-muted small mb-2"><i class="fas fa-fire"></i> CURRENT STREAK</p>
+                  <p class="stat-caption mb-2">CURRENT STREAK</p>
                   <h3 class="text-warning mb-0">
                     <AnimatedNumber :value="stats.currentStreak" /> <small>days</small>
                   </h3>
                 </div>
-                <i class="fas fa-flame fa-2x text-warning opacity-50"></i>
               </div>
             </div>
           </div>
@@ -82,12 +80,11 @@
             <div class="card-body">
               <div class="d-flex justify-content-between align-items-start">
                 <div>
-                  <p class="text-muted small mb-2"><i class="fas fa-history"></i> LONGEST STREAK</p>
+                  <p class="stat-caption mb-2">LONGEST STREAK</p>
                   <h3 class="text-info mb-0">
                     <AnimatedNumber :value="stats.longestStreak" /> <small>days</small>
                   </h3>
                 </div>
-                <i class="fas fa-crown fa-2x text-info opacity-50"></i>
               </div>
             </div>
           </div>
@@ -98,10 +95,9 @@
             <div class="card-body">
               <div class="d-flex justify-content-between align-items-start">
                 <div>
-                  <p class="text-muted small mb-2"><i class="fas fa-clock"></i> TOTAL TIME</p>
+                  <p class="stat-caption mb-2">TIME AT THE DESK</p>
                   <h3 class="text-accent mb-0">{{ formatTime(stats.totalStudyTime) }}</h3>
                 </div>
-                <i class="fas fa-hourglass-end fa-2x text-accent opacity-50"></i>
               </div>
             </div>
           </div>
@@ -112,9 +108,9 @@
       <div class="row mb-5 panel-row">
         <div class="col-12">
           <div class="card">
-            <div class="card-header bg-code border-bottom border-1">
+            <div class="card-header border-bottom border-1">
               <h5 class="mb-0">
-                <i class="fas fa-layer-group text-accent"></i> Performance by Category
+                <i class="fas fa-archive text-accent" aria-hidden="true"></i> By drawer
               </h5>
             </div>
             <div class="card-body">
@@ -128,7 +124,7 @@
                   class="col-md-6 col-lg-4"
                 >
                   <div class="category-stat">
-                    <h6 class="text-accent text-uppercase mb-3">{{ category }}</h6>
+                    <h6 class="category-name text-uppercase mb-3">{{ category }}</h6>
 
                     <div class="stat-row mb-3">
                       <div class="d-flex justify-content-between mb-2">
@@ -175,9 +171,10 @@
                 </div>
               </div>
               <div v-else class="text-center py-4 text-muted">
-                <p>No category data yet. Start studying to see stats!</p>
+                <p class="serial mb-2">NO ENTRIES YET</p>
+                <p>Study a card and this sheet fills in.</p>
                 <router-link to="/flashcards" class="btn btn-primary btn-sm">
-                  <i class="fas fa-play"></i> Start Studying
+                  Open the drawer <i class="fas fa-arrow-right" aria-hidden="true"></i>
                 </router-link>
               </div>
             </div>
@@ -189,8 +186,10 @@
       <div v-if="stats.lastStudiedAt" class="row panel-row">
         <div class="col-md-6">
           <div class="card">
-            <div class="card-header bg-code border-bottom border-1">
-              <h5 class="mb-0"><i class="fas fa-history text-accent"></i> Last Session</h5>
+            <div class="card-header border-bottom border-1">
+              <h5 class="mb-0">
+                <i class="fas fa-history text-accent" aria-hidden="true"></i> Last sitting
+              </h5>
             </div>
             <div class="card-body">
               <p class="mb-2">
@@ -198,8 +197,8 @@
                 <code>{{ formatDate(stats.lastStudiedAt) }}</code>
               </p>
               <p class="mb-0">
-                <strong>Session Details:</strong><br />
-                <code>Duration: {{ stats.totalStudyTime }} minutes</code>
+                <strong>At the desk for:</strong><br />
+                <code>{{ stats.totalStudyTime }} minutes</code>
               </p>
             </div>
           </div>
@@ -207,12 +206,14 @@
 
         <div class="col-md-6">
           <div class="card">
-            <div class="card-header bg-code border-bottom border-1">
-              <h5 class="mb-0"><i class="fas fa-stats text-accent"></i> Session Stats</h5>
+            <div class="card-header border-bottom border-1">
+              <h5 class="mb-0">
+                <i class="fas fa-clipboard-list text-accent" aria-hidden="true"></i> Ledger totals
+              </h5>
             </div>
             <div class="card-body">
               <p class="mb-2">
-                <strong>Sessions:</strong><br />
+                <strong>Sittings:</strong><br />
                 <code>{{ stats.sessionCount }} completed</code>
               </p>
               <p class="mb-0">
@@ -300,7 +301,8 @@ onMounted(() => {
         duration: 0.7,
         stagger: 0.12,
         ease: 'power3.out',
-        scrollTrigger: { trigger: row, start: 'top 82%', once: true },
+        // entry-based start so the last row is always reachable (see HomeView)
+        scrollTrigger: { trigger: row, start: 'top bottom-=60', once: true },
       })
     })
   }, rootRef.value)
@@ -317,27 +319,50 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: linear-gradient(135deg, #0a0e27 0%, #0f172a 100%);
 }
 
 main {
   flex: 1;
 }
 
+.stat-caption {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 1.5px;
+  color: var(--ink-soft);
+  margin-bottom: 0.5rem;
+}
+
 .stat-card {
-  transition: all 0.3s ease;
+  /* No `transition: transform` on GSAP-animated elements: gsap.from()
+     lazily records its end value from the computed style, and a CSS
+     transform transition makes that read a lagging partial value —
+     the tween then finishes mid-air (frozen y≠0). */
+  transition: border-color 0.2s ease;
+  border-top: 3px solid var(--rule);
 }
 
 .stat-card:hover {
-  transform: translateY(-4px);
   border-color: var(--accent);
-  box-shadow: 0 15px 35px rgba(0, 212, 255, 0.15);
+}
+
+.stat-card h3 {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 2rem;
+}
+
+.category-name {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  letter-spacing: 1.5px;
+  color: var(--accent);
 }
 
 .category-stat {
   padding: 1.5rem;
-  background: rgba(0, 212, 255, 0.05);
-  border-radius: 8px;
+  background: var(--surface-2);
+  border-radius: 2px;
   border-left: 3px solid var(--accent);
 }
 
@@ -352,11 +377,11 @@ main {
 
 code {
   font-size: 0.85rem;
-  padding: 0.25rem 0.5rem;
-  background: var(--code-bg);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  color: #4ade80;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  color: var(--ink);
 }
 
 @media (max-width: 768px) {

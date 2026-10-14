@@ -32,7 +32,7 @@
                     data-bs-toggle="collapse"
                     data-bs-target="#mobileFilters"
                   >
-                    <i class="fas fa-sliders-h"></i> Filters & Settings
+                    <i class="fas fa-sliders-h" aria-hidden="true"></i> Drawer controls
                   </button>
                 </h2>
                 <div
@@ -63,22 +63,23 @@
             class="study-header mb-4 d-flex flex-wrap justify-content-between align-items-start gap-2"
           >
             <div>
-              <h1><i class="fas fa-book-open"></i> Study</h1>
+              <p class="serial mb-1">DESK 01 · {{ store.filteredCards.length }} CARDS IN VIEW</p>
+              <h1>Study desk</h1>
               <p class="text-muted small mb-0" v-if="store.selectedCategory !== 'all'">
-                Category: <span class="badge bg-info">{{ getCurrentCategoryName }}</span>
+                Drawer: <span class="badge bg-info">{{ getCurrentCategoryName }}</span>
               </p>
             </div>
             <router-link to="/manage" class="btn btn-outline-light btn-sm">
-              <i class="fas fa-pen"></i> Manage Cards
+              <i class="fas fa-pen-fancy" aria-hidden="true"></i> Edit the catalog
             </router-link>
           </div>
 
-          <!-- Keyboard hints -->
-          <div class="keyboard-hints mb-3 small text-muted">
-            <span class="badge bg-secondary me-2"><kbd>←</kbd><kbd>→</kbd> navigate</span>
-            <span class="badge bg-secondary me-2"><kbd>Space</kbd> flip</span>
-            <span class="badge bg-secondary me-2"><kbd>K</kbd> know</span>
-            <span class="badge bg-secondary"><kbd>R</kbd> review</span>
+          <!-- Keyboard legend — a typed slip clipped to the desk -->
+          <div class="legend mb-3" aria-label="Keyboard shortcuts">
+            <span><kbd>←</kbd><kbd>→</kbd> page through</span>
+            <span><kbd>Space</kbd> turn over</span>
+            <span><kbd>K</kbd> mark known</span>
+            <span><kbd>R</kbd> needs review</span>
           </div>
 
           <!-- Category Selection Collapsible -->
@@ -87,8 +88,8 @@
               class="collapse-header w-100"
               @click="toggleCategoryCollapse = !toggleCategoryCollapse"
             >
-              <i class="fas fa-sitemap"></i>
-              <span>Select Category</span>
+              <i class="fas fa-archive" aria-hidden="true"></i>
+              <span>Pick a drawer</span>
               <i
                 class="fas fa-chevron-down collapse-icon ms-auto"
                 :class="{ open: toggleCategoryCollapse }"
@@ -103,7 +104,8 @@
                   :class="{ active: store.selectedCategory === category.id }"
                   @click="handleCategoryChange(category.id)"
                 >
-                  {{ category.icon }} {{ category.name }}
+                  <i :class="category.icon" aria-hidden="true"></i>
+                  {{ category.name }}
                   <span class="badge bg-secondary float-end">{{ category.cardCount }}</span>
                 </button>
               </div>
@@ -129,19 +131,33 @@
                 :answer="store.currentCard?.answer || ''"
                 :category="currentCategoryLabel"
                 :difficulty="store.currentCard?.difficulty || 'medium'"
+                :serial="store.currentIndex + 1"
                 @know-this="markMastered"
                 @review-again="markReview"
               />
+            </Transition>
+
+            <!-- Grading stamp — slammed on before the card is filed away -->
+            <Transition :css="false" @leave="onStampLeave">
+              <div
+                v-if="stamp"
+                ref="stampRef"
+                class="grade-stamp"
+                :class="stamp.tone === 'green' ? 'stamp--green' : 'stamp--red'"
+                aria-live="polite"
+              >
+                {{ stamp.text }}
+              </div>
             </Transition>
           </div>
 
           <!-- Empty State -->
           <div v-else class="empty-state text-center py-5">
-            <div class="display-1 mb-3">📭</div>
-            <h3>No Cards Found</h3>
-            <p class="text-muted">Try selecting a different category or filter</p>
+            <p class="serial mb-2">EMPTY DRAWER</p>
+            <h3>Nothing filed under this filter</h3>
+            <p class="text-muted">Try another drawer, or show every card again.</p>
             <button @click="resetFilters" class="btn btn-primary">
-              <i class="fas fa-redo"></i> Reset Filters
+              <i class="fas fa-redo" aria-hidden="true"></i> Reset filters
             </button>
           </div>
 
@@ -153,7 +169,7 @@
                 :disabled="store.currentIndex === 0"
                 class="btn btn-outline-light"
               >
-                <i class="fas fa-chevron-left"></i> Previous
+                <i class="fas fa-chevron-left" aria-hidden="true"></i> Previous
               </button>
 
               <div class="btn btn-secondary" disabled>
@@ -165,23 +181,21 @@
                 :disabled="store.currentIndex === store.filteredCards.length - 1"
                 class="btn btn-outline-light"
               >
-                Next <i class="fas fa-chevron-right"></i>
+                Next <i class="fas fa-chevron-right" aria-hidden="true"></i>
               </button>
             </div>
 
             <div class="d-flex gap-2 justify-content-center flex-wrap mt-3">
               <button @click="handleShuffle" class="btn btn-info btn-sm">
-                <i class="fas fa-random"></i> Shuffle
+                <i class="fas fa-random" aria-hidden="true"></i> Shuffle the drawer
               </button>
               <button @click="resetProgress" class="btn btn-warning btn-sm">
-                <i class="fas fa-undo"></i> Reset
+                <i class="fas fa-undo" aria-hidden="true"></i> Reset marks
               </button>
             </div>
 
             <div class="text-center mt-3">
-              <small class="text-muted">
-                <i class="fas fa-clock"></i> On this card: {{ timer.elapsed.value }}s
-              </small>
+              <small class="serial">TIME AT THIS CARD — {{ timer.elapsed.value }}s</small>
             </div>
           </div>
         </div>
@@ -191,7 +205,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useCardsStore } from '../stores/cards'
 import { useSessionStore } from '../stores/session'
 import { useSettingsStore } from '../stores/settings'
@@ -210,6 +224,7 @@ const settings = useSettingsStore()
 
 const cardRef = ref<InstanceType<typeof CodeCard> | null>(null)
 const cardDisplayRef = ref<HTMLElement | null>(null)
+const stampRef = ref<HTMLElement | null>(null)
 const toggleCategoryCollapse = ref(false)
 
 const timer = useSessionTimer()
@@ -242,15 +257,29 @@ const onCardEnter = (el: Element, done: () => void) => {
   )
 }
 
+const onStampLeave = (el: Element, done: () => void) => {
+  gsap.to(el, { opacity: 0, duration: 0.15, onComplete: done })
+}
+
 /* --------------- Navigation --------------- */
 
+const clearStamp = () => {
+  if (stampTimer) {
+    clearTimeout(stampTimer)
+    stampTimer = null
+  }
+  stamp.value = null
+}
+
 const handleNext = () => {
+  clearStamp()
   store.nextCard()
   cardRef.value?.resetFlip()
   timer.restart()
 }
 
 const handlePrevious = () => {
+  clearStamp()
   store.prevCard()
   cardRef.value?.resetFlip()
   timer.restart()
@@ -297,22 +326,52 @@ const resetFilters = () => {
   store.setFilterMode('all')
 }
 
-/* --------------- Grading --------------- */
+/* --------------- Grading — stamp first, then file the card away --------------- */
+
+const stamp = ref<{ text: string; tone: 'green' | 'red' } | null>(null)
+let stampTimer: ReturnType<typeof setTimeout> | null = null
+
+const stampAndAdvance = (text: string, tone: 'green' | 'red') => {
+  stamp.value = { text, tone }
+  stampTimer = setTimeout(() => {
+    stampTimer = null
+    stamp.value = null
+    // advance without clearing the stamp we just removed (avoid double reset)
+    store.nextCard()
+    cardRef.value?.resetFlip()
+    timer.restart()
+  }, 550)
+}
+
+// the stamp lands like it was slammed down by hand
+watch(stamp, async (value) => {
+  if (!value) return
+  await nextTick()
+  if (stampRef.value) {
+    gsap.fromTo(
+      stampRef.value,
+      { scale: 2.4, opacity: 0, rotate: -18 },
+      { scale: 1, opacity: 1, rotate: -8, duration: 0.28, ease: 'back.out(2.5)' },
+    )
+  }
+})
 
 const markMastered = () => {
+  if (stamp.value) return
   const card = store.currentCard
   if (!card) return
   store.markCardMastered(card.id)
   session.recordCardAttempt(card.id, true, timer.elapsed.value)
-  handleNext()
+  stampAndAdvance('Mastered', 'green')
 }
 
 const markReview = () => {
+  if (stamp.value) return
   const card = store.currentCard
   if (!card) return
   store.markCardForReview(card.id)
   session.recordCardAttempt(card.id, false, timer.elapsed.value)
-  handleNext()
+  stampAndAdvance('Needs review', 'red')
 }
 
 /* --------------- Keyboard + swipe --------------- */
@@ -358,6 +417,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  clearStamp()
   timer.stop()
   session.endSession()
 })
@@ -386,23 +446,32 @@ onBeforeUnmount(() => {
 }
 
 .study-header {
-  border-bottom: 2px solid var(--border);
+  border-bottom: 3px double var(--rule);
   padding-bottom: 1.5rem;
 }
 
 .study-header h1 {
-  font-size: 2.5rem;
+  font-size: 2.25rem;
   margin-bottom: 0.5rem;
 }
 
-.keyboard-hints kbd {
-  background: var(--code-bg);
-  border: 1px solid var(--border);
-  color: var(--accent);
+/* Typed shortcut slip */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.5rem;
+  background: var(--surface-2);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+  border-radius: 2px;
+  padding: 0.6rem 1rem;
   font-family: var(--font-mono);
-  font-size: 0.7rem;
-  margin: 0 2px;
-  box-shadow: none;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+
+.legend kbd {
+  margin-right: 0.35rem;
 }
 
 .mobile-controls {
@@ -411,28 +480,43 @@ onBeforeUnmount(() => {
 
 .accordion-button {
   font-family: var(--font-mono);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  background: var(--code-bg);
-  color: var(--accent);
-  border: 1px solid var(--border);
+  font-weight: 700;
+  background: var(--surface-2);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
 }
 
 .accordion-button:not(.collapsed) {
-  background: rgba(0, 212, 255, 0.1);
+  background: color-mix(in srgb, var(--accent) 10%, var(--surface-2));
   border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: none;
 }
 
 .accordion-button:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 0.25rem rgba(0, 212, 255, 0.25);
+  box-shadow: none;
+}
+
+.accordion-button::after {
+  background-image: none;
+  content: '\f078';
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+  color: var(--ink-soft);
+}
+
+.accordion-item {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 2px !important;
 }
 
 .accordion-body {
   padding: 0;
   background: transparent;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--rule);
 }
 
 .category-selector {
@@ -444,20 +528,17 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 0.75rem;
   padding: 1rem;
-  background: var(--code-bg);
-  border: 1px solid var(--border);
-  border-radius: 6px;
+  background: var(--surface-2);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
   font-family: var(--font-mono);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s ease;
-  color: var(--code-text);
+  transition: border-color 0.2s ease;
+  color: var(--ink);
 }
 
 .collapse-header:hover {
-  background: rgba(0, 212, 255, 0.1);
   border-color: var(--accent);
   color: var(--accent);
 }
@@ -486,39 +567,66 @@ onBeforeUnmount(() => {
 }
 
 .list-group-item {
-  background: var(--code-bg);
-  border: 1px solid var(--border);
-  color: var(--code-text);
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 0;
+  color: var(--ink);
   font-family: var(--font-mono);
-  transition: all 0.3s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 .list-group-item:hover {
-  background: rgba(0, 212, 255, 0.1);
-  border-color: var(--accent);
+  background: var(--surface-2);
   color: var(--accent);
 }
 
 .list-group-item.active {
-  background: linear-gradient(135deg, var(--accent) 0%, var(--secondary) 100%);
-  border-color: transparent;
-  color: var(--darker);
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #faf5e9;
+}
+
+.list-group-item.active .badge {
+  color: #faf5e9;
+  background: transparent !important;
+  border-color: rgba(250, 245, 233, 0.6);
 }
 
 .card-display {
+  position: relative;
   min-height: 450px;
+}
+
+/* The rubber stamp that lands when you grade a card */
+.grade-stamp {
+  position: absolute;
+  top: 42%;
+  left: 50%;
+  z-index: 5;
+  transform: translate(-50%, -50%) rotate(-8deg);
+  pointer-events: none;
+  font-size: 1.4rem;
+  letter-spacing: 4px;
+  padding: 0.5rem 1.4rem;
+  background: color-mix(in srgb, var(--surface) 55%, transparent);
 }
 
 .empty-state {
   padding: 4rem 2rem;
-  border: 2px dashed var(--border);
-  border-radius: 12px;
-  background: rgba(0, 212, 255, 0.05);
+  border: 2px dashed var(--rule);
+  border-radius: 3px;
+  background: var(--surface-2);
+}
+
+.empty-state h3 {
+  font-size: 1.3rem;
 }
 
 .navigation {
   padding: 2rem 0;
-  border-top: 2px solid var(--border);
+  border-top: 3px double var(--rule);
 }
 
 @media (max-width: 768px) {
@@ -531,7 +639,7 @@ onBeforeUnmount(() => {
   }
 
   .study-header h1 {
-    font-size: 1.75rem;
+    font-size: 1.6rem;
   }
 
   .card-display {
