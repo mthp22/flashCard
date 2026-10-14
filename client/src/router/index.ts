@@ -4,6 +4,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 const HomeView = () => import('../views/HomeView.vue')
 const FlashcardsView = () => import('../views/FlashcardsView.vue')
 const StatsView = () => import('../views/StatsView.vue')
+const ManageView = () => import('../views/ManageView.vue')
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -22,6 +23,11 @@ const router = createRouter({
       path: '/stats',
       name: 'stats',
       component: StatsView,
+    },
+    {
+      path: '/manage',
+      name: 'manage',
+      component: ManageView,
     },
     {
       path: '/:pathMatch(.*)*',

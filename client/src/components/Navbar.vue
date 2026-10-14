@@ -26,6 +26,9 @@
           <router-link to="/stats" class="nav-link" active-class="active">
             <i class="fas fa-chart-bar"></i> Stats
           </router-link>
+          <router-link to="/manage" class="nav-link" active-class="active">
+            <i class="fas fa-pen"></i> Manage
+          </router-link>
           <button
             @click="toggleDarkMode"
             class="btn btn-outline-light btn-sm"

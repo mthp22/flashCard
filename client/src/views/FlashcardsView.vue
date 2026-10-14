@@ -68,6 +68,9 @@
                 Category: <span class="badge bg-info">{{ getCurrentCategoryName }}</span>
               </p>
             </div>
+            <router-link to="/manage" class="btn btn-outline-light btn-sm">
+              <i class="fas fa-pen"></i> Manage Cards
+            </router-link>
           </div>
 
           <!-- Keyboard hints -->
