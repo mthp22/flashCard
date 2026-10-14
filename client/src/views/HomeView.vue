@@ -7,9 +7,7 @@
       <section class="hero-section container-fluid py-5">
         <div class="row align-items-center">
           <div class="col-lg-6 py-5">
-            <p class="hero-eyebrow serial mb-3">
-              A CARD CATALOG FOR TECHNICAL INTERVIEW PREP · 537.19
-            </p>
+            <p class="hero-eyebrow serial mb-3">A CARD CATALOG FOR TECHNICAL INTERVIEW PREP</p>
             <h1 class="display-4 fw-bold mb-4 hero-title">
               A drawer of {{ store.cards.length }} interview cards.
             </h1>

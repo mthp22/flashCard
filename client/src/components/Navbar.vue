@@ -1,9 +1,7 @@
 <template>
   <nav class="navbar navbar-expand-lg sticky-top">
     <div class="container-fluid">
-      <router-link to="/" class="navbar-brand">
-        Flashcard Catalog<span class="brand-serial">№ 537.19</span>
-      </router-link>
+      <router-link to="/" class="navbar-brand"> Flashcard Catalog </router-link>
 
       <button
         class="navbar-toggler"

@@ -496,12 +496,6 @@ kbd {
   gap: 0.5rem;
 }
 
-.brand-serial {
-  font-size: 0.7rem;
-  letter-spacing: 1px;
-  color: var(--ink-soft);
-}
-
 .nav-link {
   color: var(--ink) !important;
   font-family: var(--font-mono);
