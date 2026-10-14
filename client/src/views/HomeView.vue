@@ -111,27 +111,6 @@
           </div>
         </div>
       </section>
-
-      <!-- Colophon — honest credits instead of a fake CTA -->
-      <section class="colophon-section container-fluid py-5 reveal-section">
-        <div class="row align-items-center justify-content-between g-4">
-          <div class="col-lg-8 reveal-item">
-            <p class="colophon mb-2">
-              Set in Courier Prime and IBM Plex Sans. Built with Vue 3, animated with GSAP, state
-              kept in Pinia.
-            </p>
-            <p class="colophon-quiet mb-0">
-              No analytics, no cookies, no server. The deck lives in memory — close the tab and it
-              starts fresh. That is the whole contract.
-            </p>
-          </div>
-          <div class="col-lg-4 text-lg-end reveal-item">
-            <router-link to="/flashcards" class="btn btn-primary">
-              Open the drawer <i class="fas fa-arrow-right" aria-hidden="true"></i>
-            </router-link>
-          </div>
-        </div>
-      </section>
     </main>
   </div>
 </template>
@@ -543,25 +522,6 @@ onBeforeUnmount(() => {
 .drawer-pull {
   letter-spacing: 2px;
   color: color-mix(in srgb, var(--drawer-ink) 60%, var(--drawer) 40%);
-}
-
-/* ---------------- Colophon ---------------- */
-
-.colophon-section {
-  border-top: 3px double var(--rule);
-  background: var(--surface-2);
-}
-
-.colophon {
-  font-family: var(--font-mono);
-  font-size: 0.95rem;
-  color: var(--ink);
-}
-
-.colophon-quiet {
-  color: var(--ink-soft);
-  font-size: 0.9rem;
-  max-width: 44rem;
 }
 
 @media (max-width: 768px) {

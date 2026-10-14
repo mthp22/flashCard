@@ -46,11 +46,11 @@ test('reveals every section when scrolling to the bottom', async ({ page }) => {
     await page.evaluate((pos) => window.scrollTo(0, pos), y)
     await page.waitForTimeout(80)
   }
-  // the last sections must actually reveal (opacity, not just layout)
+  // the last section must actually reveal (opacity, not just layout)
   const drawers = page.locator('.section-title', { hasText: 'The drawers' })
-  const colophon = page.locator('.colophon-section .reveal-item').first()
+  const lastItem = page.locator('.reveal-item').last()
   await expect.poll(async () => drawers.evaluate((el) => getComputedStyle(el).opacity)).toBe('1')
-  await expect.poll(async () => colophon.evaluate((el) => getComputedStyle(el).opacity)).toBe('1')
+  await expect.poll(async () => lastItem.evaluate((el) => getComputedStyle(el).opacity)).toBe('1')
 })
 
 test('toggles between paper and dim themes', async ({ page }) => {
