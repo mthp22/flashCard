@@ -7,15 +7,15 @@
         <!-- Sidebar -->
         <div class="col-lg-3 d-none d-lg-block">
           <Sidebar
-            :categories="store.categories"
+            :categories="store.categoriesWithCount"
             :selected-category="store.selectedCategory"
             :selected-mode="store.studyMode"
             :selected-filter="store.filterMode"
-            :sound-enabled="store.soundEnabled"
+            :sound-enabled="settings.soundEnabled"
             @mode-change="handleModeChange"
             @filter-change="handleFilterChange"
             @category-change="handleCategoryChange"
-            @toggle-sound="store.toggleSound()"
+            @toggle-sound="settings.toggleSound()"
           />
         </div>
 
@@ -35,18 +35,22 @@
                     <i class="fas fa-sliders-h"></i> Filters & Settings
                   </button>
                 </h2>
-                <div id="mobileFilters" class="accordion-collapse collapse" data-bs-parent="#mobileControls">
+                <div
+                  id="mobileFilters"
+                  class="accordion-collapse collapse"
+                  data-bs-parent="#mobileControls"
+                >
                   <div class="accordion-body">
                     <Sidebar
-                      :categories="store.categories"
+                      :categories="store.categoriesWithCount"
                       :selected-category="store.selectedCategory"
                       :selected-mode="store.studyMode"
                       :selected-filter="store.filterMode"
-                      :sound-enabled="store.soundEnabled"
+                      :sound-enabled="settings.soundEnabled"
                       @mode-change="handleModeChange"
                       @filter-change="handleFilterChange"
                       @category-change="handleCategoryChange"
-                      @toggle-sound="store.toggleSound()"
+                      @toggle-sound="settings.toggleSound()"
                     />
                   </div>
                 </div>
@@ -55,32 +59,48 @@
           </div>
 
           <!-- Header -->
-          <div class="study-header mb-4">
-            <h1>
-              <i class="fas fa-book-open"></i> Study
-            </h1>
-            <p class="text-muted small mb-3" v-if="store.selectedCategory !== 'all'">
-              Category: <span class="badge bg-info">{{ getCurrentCategoryName }}</span>
-            </p>
+          <div
+            class="study-header mb-4 d-flex flex-wrap justify-content-between align-items-start gap-2"
+          >
+            <div>
+              <h1><i class="fas fa-book-open"></i> Study</h1>
+              <p class="text-muted small mb-0" v-if="store.selectedCategory !== 'all'">
+                Category: <span class="badge bg-info">{{ getCurrentCategoryName }}</span>
+              </p>
+            </div>
+          </div>
+
+          <!-- Keyboard hints -->
+          <div class="keyboard-hints mb-3 small text-muted">
+            <span class="badge bg-secondary me-2"><kbd>←</kbd><kbd>→</kbd> navigate</span>
+            <span class="badge bg-secondary me-2"><kbd>Space</kbd> flip</span>
+            <span class="badge bg-secondary me-2"><kbd>K</kbd> know</span>
+            <span class="badge bg-secondary"><kbd>R</kbd> review</span>
           </div>
 
           <!-- Category Selection Collapsible -->
           <div class="category-selector mb-4 d-lg-none">
-            <button class="collapse-header w-100" @click="toggleCategoryCollapse = !toggleCategoryCollapse">
+            <button
+              class="collapse-header w-100"
+              @click="toggleCategoryCollapse = !toggleCategoryCollapse"
+            >
               <i class="fas fa-sitemap"></i>
               <span>Select Category</span>
-              <i class="fas fa-chevron-down collapse-icon ms-auto" :class="{ open: toggleCategoryCollapse }"></i>
+              <i
+                class="fas fa-chevron-down collapse-icon ms-auto"
+                :class="{ open: toggleCategoryCollapse }"
+              ></i>
             </button>
             <div v-if="toggleCategoryCollapse" class="collapse-content mt-2">
               <div class="list-group">
                 <button
-                  v-for="category in store.categories"
+                  v-for="category in store.categoriesWithCount"
                   :key="category.id"
                   class="list-group-item list-group-item-action"
                   :class="{ active: store.selectedCategory === category.id }"
                   @click="handleCategoryChange(category.id)"
                 >
-                  {{ getIcon(category.name) }} {{ category.name }}
+                  {{ category.icon }} {{ category.name }}
                   <span class="badge bg-secondary float-end">{{ category.cardCount }}</span>
                 </button>
               </div>
@@ -97,17 +117,19 @@
           />
 
           <!-- Main Card Display -->
-          <div class="card-display mt-4" v-if="store.filteredCards.length > 0">
-            <CodeCard
-              ref="cardRef"
-              :key="store.currentCard?.id"
-              :question="store.currentCard?.question || ''"
-              :answer="store.currentCard?.answer || ''"
-              :category="store.currentCard?.category || ''"
-              :difficulty="store.currentCard?.difficulty || 'medium'"
-              @know-this="markMastered"
-              @review-again="markReview"
-            />
+          <div class="card-display mt-4" ref="cardDisplayRef" v-if="store.filteredCards.length > 0">
+            <Transition :css="false" mode="out-in" @enter="onCardEnter" @leave="onCardLeave">
+              <CodeCard
+                ref="cardRef"
+                :key="store.currentCard?.id"
+                :question="store.currentCard?.question || ''"
+                :answer="store.currentCard?.answer || ''"
+                :category="currentCategoryLabel"
+                :difficulty="store.currentCard?.difficulty || 'medium'"
+                @know-this="markMastered"
+                @review-again="markReview"
+              />
+            </Transition>
           </div>
 
           <!-- Empty State -->
@@ -152,6 +174,12 @@
                 <i class="fas fa-undo"></i> Reset
               </button>
             </div>
+
+            <div class="text-center mt-3">
+              <small class="text-muted">
+                <i class="fas fa-clock"></i> On this card: {{ timer.elapsed.value }}s
+              </small>
+            </div>
           </div>
         </div>
       </div>
@@ -160,98 +188,175 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useFlashcardStore } from '../stores/flashcardStore'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { useCardsStore } from '../stores/cards'
+import { useSessionStore } from '../stores/session'
+import { useSettingsStore } from '../stores/settings'
+import { useKeyboardNav } from '../composables/useKeyboardNav'
+import { useSwipeGesture } from '../composables/useSwipeGesture'
+import { useSessionTimer } from '../composables/useSessionTimer'
+import { gsap } from '../plugins/gsap'
 import Navbar from '../components/Navbar.vue'
 import Sidebar from '../components/Sidebar.vue'
 import ProgressCard from '../components/ProgressCard.vue'
 import CodeCard from '../components/CodeCard.vue'
 
-const store = useFlashcardStore()
-const cardRef = ref()
+const store = useCardsStore()
+const session = useSessionStore()
+const settings = useSettingsStore()
+
+const cardRef = ref<InstanceType<typeof CodeCard> | null>(null)
+const cardDisplayRef = ref<HTMLElement | null>(null)
 const toggleCategoryCollapse = ref(false)
+
+const timer = useSessionTimer()
+
+/* --------------- Card transitions (GSAP) --------------- */
+
+const onCardLeave = (el: Element, done: () => void) => {
+  gsap.to(el, {
+    x: -70,
+    opacity: 0,
+    rotate: -3,
+    duration: 0.28,
+    ease: 'power2.in',
+    onComplete: done,
+  })
+}
+
+const onCardEnter = (el: Element, done: () => void) => {
+  gsap.fromTo(
+    el,
+    { x: 70, opacity: 0, rotate: 3 },
+    {
+      x: 0,
+      opacity: 1,
+      rotate: 0,
+      duration: 0.45,
+      ease: 'back.out(1.5)',
+      onComplete: done,
+    },
+  )
+}
+
+/* --------------- Navigation --------------- */
 
 const handleNext = () => {
   store.nextCard()
   cardRef.value?.resetFlip()
+  timer.restart()
 }
 
 const handlePrevious = () => {
   store.prevCard()
   cardRef.value?.resetFlip()
+  timer.restart()
 }
 
 const handleModeChange = (mode: 'normal' | 'quiz' | 'random') => {
   store.setStudyMode(mode)
   cardRef.value?.resetFlip()
+  timer.restart()
 }
 
 const handleFilterChange = (filter: 'all' | 'mastered' | 'review') => {
   store.setFilterMode(filter)
+  timer.restart()
 }
 
-const handleCategoryChange = async (category: string) => {
+const handleCategoryChange = (category: string) => {
   store.setCategory(category)
   toggleCategoryCollapse.value = false
   cardRef.value?.resetFlip()
+  timer.restart()
+  // New session scope when the category changes
+  if (session.currentSession) {
+    session.endSession()
+    session.startSession(category, store.studyMode)
+  }
 }
 
 const handleShuffle = () => {
   store.shuffleCards()
   store.resetProgress()
   cardRef.value?.resetFlip()
+  timer.restart()
 }
 
 const resetProgress = () => {
   store.resetProgress()
   cardRef.value?.resetFlip()
+  timer.restart()
 }
 
 const resetFilters = () => {
-  store.selectedCategory = 'all'
-  store.filterMode = 'all'
-  store.currentIndex = 0
+  store.setCategory('all')
+  store.setFilterMode('all')
 }
 
-const markMastered = async () => {
+/* --------------- Grading --------------- */
+
+const markMastered = () => {
   const card = store.currentCard
-  if (card?.id) {
-    await store.markCardMastered(card.id)
-    handleNext()
-  }
+  if (!card) return
+  store.markCardMastered(card.id)
+  session.recordCardAttempt(card.id, true, timer.elapsed.value)
+  handleNext()
 }
 
-const markReview = async () => {
+const markReview = () => {
   const card = store.currentCard
-  if (card?.id) {
-    await store.markCardForReview(card.id)
-    handleNext()
-  }
+  if (!card) return
+  store.markCardForReview(card.id)
+  session.recordCardAttempt(card.id, false, timer.elapsed.value)
+  handleNext()
 }
+
+/* --------------- Keyboard + swipe --------------- */
+
+useKeyboardNav({
+  onNext: handleNext,
+  onPrev: handlePrevious,
+  onFlip: () => cardRef.value?.flip(),
+  onMarkCorrect: markMastered,
+  onMarkReview: markReview,
+})
+
+useSwipeGesture(cardDisplayRef, {
+  onSwipeLeft: handleNext,
+  onSwipeRight: handlePrevious,
+  onSwipeUp: () => cardRef.value?.flip(),
+})
+
+/* --------------- Derived --------------- */
 
 const getCurrentCategoryName = computed(() => {
   if (store.selectedCategory === 'all') return 'All'
-  return store.categories.find((c) => c.id === store.selectedCategory)?.name || 'Unknown'
+  return store.categoriesWithCount.find((c) => c.id === store.selectedCategory)?.name || 'Unknown'
 })
 
-const getIcon = (name: string): string => {
-  const icons: Record<string, string> = {
-    JavaScript: '📜',
-    'Vue.js': '🟢',
-    Angular: '🔴',
-    '.NET': '🟦',
-    GraphQL: '🔸',
-    Python: '🐍',
-    Java: '☕',
-    'Spring Boot': '🍃',
-  }
-  return icons[name] || '📚'
-}
+const currentCategoryLabel = computed(() => {
+  const categoryId = store.currentCard?.category
+  if (!categoryId) return ''
+  return store.categoriesWithCount.find((c) => c.id === categoryId)?.name ?? categoryId
+})
 
-onMounted(async () => {
-  store.loadSettings()
-  await store.fetchCategories()
-  await store.fetchCards()
+/* --------------- Session lifecycle --------------- */
+
+watch(
+  () => store.currentIndex,
+  () => timer.restart(),
+)
+
+onMounted(() => {
+  store.hydrate()
+  session.startSession(store.selectedCategory, store.studyMode)
+  timer.restart()
+})
+
+onBeforeUnmount(() => {
+  timer.stop()
+  session.endSession()
 })
 </script>
 
@@ -280,12 +385,21 @@ onMounted(async () => {
 .study-header {
   border-bottom: 2px solid var(--border);
   padding-bottom: 1.5rem;
-  margin-bottom: 2rem;
 }
 
 .study-header h1 {
   font-size: 2.5rem;
   margin-bottom: 0.5rem;
+}
+
+.keyboard-hints kbd {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  margin: 0 2px;
+  box-shadow: none;
 }
 
 .mobile-controls {

@@ -9,7 +9,7 @@
         <!-- Current Card -->
         <div class="col-6 col-md-3">
           <div class="stat-item">
-            <div class="stat-value text-accent">{{ currentIndex + 1 }}/{{ total }}</div>
+            <div class="stat-value text-accent">{{ cardPosition }}/{{ total }}</div>
             <div class="stat-label">Current Card</div>
           </div>
         </div>
@@ -17,7 +17,7 @@
         <!-- Progress % -->
         <div class="col-6 col-md-3">
           <div class="stat-item">
-            <div class="stat-value text-accent">{{ progress }}%</div>
+            <div class="stat-value text-accent">{{ animatedProgress }}%</div>
             <div class="stat-label">Complete</div>
           </div>
         </div>
@@ -25,7 +25,7 @@
         <!-- Accuracy -->
         <div class="col-6 col-md-3">
           <div class="stat-item">
-            <div class="stat-value" :class="accuracyColor">{{ accuracy }}%</div>
+            <div class="stat-value" :class="accuracyColor">{{ animatedAccuracy }}%</div>
             <div class="stat-label">Accuracy</div>
           </div>
         </div>
@@ -33,23 +33,23 @@
         <!-- Mastered -->
         <div class="col-6 col-md-3">
           <div class="stat-item">
-            <div class="stat-value text-success">{{ mastered }}</div>
+            <div class="stat-value text-success">{{ animatedMastered }}</div>
             <div class="stat-label">Mastered</div>
           </div>
         </div>
       </div>
 
-      <!-- Progress Bar -->
+      <!-- Progress Bar (GSAP-tweened width) -->
       <div class="progress mt-4" style="height: 24px">
         <div
+          ref="barRef"
           class="progress-bar"
           role="progressbar"
-          :style="{ width: progress + '%' }"
           :aria-valuenow="progress"
           aria-valuemin="0"
           aria-valuemax="100"
         >
-          {{ progress }}%
+          {{ animatedProgress }}%
         </div>
       </div>
 
@@ -71,7 +71,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
+import { gsap } from '../plugins/gsap'
+import { useCountUp } from '../composables/useCountUp'
 
 interface Props {
   currentIndex: number
@@ -83,15 +85,42 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const progress = computed(() => (props.total > 0 ? Math.round(((props.currentIndex + 1) / props.total) * 100) : 0))
+const barRef = ref<HTMLElement | null>(null)
 
-const remaining = computed(() => props.total - props.mastered - props.reviewing)
+const progress = computed(() =>
+  props.total > 0 ? Math.round(((props.currentIndex + 1) / props.total) * 100) : 0,
+)
+
+const remaining = computed(() => Math.max(0, props.total - props.mastered - props.reviewing))
 
 const accuracyColor = computed(() => {
   if (props.accuracy >= 80) return 'text-success'
   if (props.accuracy >= 60) return 'text-warning'
   return 'text-danger'
 })
+
+// GSAP-powered count-ups
+const cardPosition = useCountUp(() => props.currentIndex + 1, { duration: 0.5 })
+const animatedProgress = useCountUp(progress, { duration: 0.6 })
+const animatedAccuracy = useCountUp(() => props.accuracy, { duration: 0.8 })
+const animatedMastered = useCountUp(() => props.mastered, { duration: 0.5 })
+
+// Tween the bar width instead of snapping it via CSS
+const animateBar = (fromZero = false) => {
+  if (!barRef.value) return
+  // Always exactly one live tween on the bar — otherwise a stale tween
+  // (e.g. the pre-hydration 0% -> 0% one) overwrites the finished value.
+  gsap.killTweensOf(barRef.value)
+  const target = { width: `${progress.value}%` }
+  if (fromZero) {
+    gsap.fromTo(barRef.value, { width: '0%' }, { ...target, duration: 0.9, ease: 'power2.out' })
+  } else {
+    gsap.to(barRef.value, { ...target, duration: 0.7, ease: 'power2.out' })
+  }
+}
+
+onMounted(() => animateBar(true))
+watch(progress, () => animateBar())
 </script>
 
 <style scoped>

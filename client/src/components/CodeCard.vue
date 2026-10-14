@@ -2,16 +2,18 @@
   <div class="code-card-container">
     <div
       class="code-card"
-      :class="{ flipped: isFlipped }"
+      ref="cardRef"
+      role="button"
+      tabindex="0"
+      aria-label="Flip card"
       @click="toggleFlip"
+      @keydown.enter.prevent="toggleFlip"
     >
       <div class="card-inner">
         <!-- Front Side - Question -->
         <div class="card-side question-side">
           <div class="card-header">
-            <span class="card-title">
-              <i class="fas fa-question-circle"></i> Question
-            </span>
+            <span class="card-title"> <i class="fas fa-question-circle"></i> Question </span>
             <span class="difficulty-badge" :class="'difficulty-' + difficulty">
               {{ difficulty }}
             </span>
@@ -20,34 +22,24 @@
             <pre><code class="text-mono">{{ question }}</code></pre>
           </div>
           <div class="card-footer">
-            <span class="hint">
-              <i class="fas fa-mouse"></i> Click to reveal answer
-            </span>
+            <span class="hint"> <i class="fas fa-mouse"></i> Click to reveal answer </span>
           </div>
         </div>
 
         <!-- Back Side - Answer -->
         <div class="card-side answer-side">
           <div class="card-header">
-            <span class="card-title">
-              <i class="fas fa-lightbulb"></i> Answer
-            </span>
+            <span class="card-title"> <i class="fas fa-lightbulb"></i> Answer </span>
             <span class="category-badge">{{ category }}</span>
           </div>
           <div class="card-content">
             <pre><code class="text-mono" v-html="highlightedAnswer"></code></pre>
           </div>
           <div class="card-actions">
-            <button
-              @click.stop="$emit('know-this')"
-              class="btn btn-success btn-sm"
-            >
+            <button @click.stop="$emit('know-this')" class="btn btn-success btn-sm">
               <i class="fas fa-check"></i> I Know This
             </button>
-            <button
-              @click.stop="$emit('review-again')"
-              class="btn btn-warning btn-sm"
-            >
+            <button @click.stop="$emit('review-again')" class="btn btn-warning btn-sm">
               <i class="fas fa-redo"></i> Review
             </button>
           </div>
@@ -58,8 +50,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import hljs from 'highlight.js'
+import { ref, computed, onBeforeUnmount } from 'vue'
+import { hljs } from '../plugins/highlight'
+import { gsap } from '../plugins/gsap'
+import { useSettingsStore } from '../stores/settings'
 
 interface Props {
   question: string
@@ -70,11 +64,24 @@ interface Props {
 
 const props = defineProps<Props>()
 
+const settings = useSettingsStore()
+const cardRef = ref<HTMLElement | null>(null)
 const isFlipped = ref(false)
 
-const toggleFlip = () => {
-  isFlipped.value = !isFlipped.value
+const flipTo = (flipped: boolean) => {
+  isFlipped.value = flipped
+  if (!cardRef.value) return
+  gsap.to(cardRef.value, {
+    rotationY: flipped ? 180 : 0,
+    duration: 0.7,
+    ease: 'back.inOut(1.4)',
+    // subtle depth pop while rotating
+    scale: flipped ? 1.02 : 1,
+  })
+  settings.playSound('flip')
 }
+
+const toggleFlip = () => flipTo(!isFlipped.value)
 
 const highlightedAnswer = computed(() => {
   try {
@@ -87,10 +94,16 @@ const highlightedAnswer = computed(() => {
 defineExpose({
   resetFlip: () => {
     isFlipped.value = false
+    if (cardRef.value) gsap.set(cardRef.value, { rotationY: 0, scale: 1 })
   },
+  flip: toggleFlip,
 })
 
 defineEmits(['know-this', 'review-again'])
+
+onBeforeUnmount(() => {
+  if (cardRef.value) gsap.killTweensOf(cardRef.value)
+})
 </script>
 
 <style scoped>
@@ -106,26 +119,20 @@ defineEmits(['know-this', 'review-again'])
   min-height: 400px;
   position: relative;
   transform-style: preserve-3d;
-  transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   cursor: pointer;
   border-radius: 12px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
-.code-card.flipped {
-  transform: rotateY(180deg);
-}
-
 .card-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
 }
 
 .card-side {
   position: absolute;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   backface-visibility: hidden;
   display: flex;
   flex-direction: column;
@@ -133,6 +140,7 @@ defineEmits(['know-this', 'review-again'])
   border: 2px solid var(--border);
   border-radius: 12px;
   padding: 2rem;
+  overflow: hidden;
 }
 
 .question-side {
@@ -205,6 +213,7 @@ defineEmits(['know-this', 'review-again'])
 
 .card-content {
   flex: 1;
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -221,6 +230,9 @@ pre {
   border-radius: 8px;
   padding: 1rem;
   overflow-x: auto;
+  /* Answers are mostly prose — wrap instead of scrolling off the card */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 code {

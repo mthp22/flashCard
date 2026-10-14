@@ -78,7 +78,11 @@
       </div>
       <div v-if="toggleCategories" class="collapse-content">
         <div class="tree">
-          <div class="tree-item" @click="$emit('category-change', 'all')" :class="{ active: selectedCategory === 'all' }">
+          <div
+            class="tree-item"
+            @click="$emit('category-change', 'all')"
+            :class="{ active: selectedCategory === 'all' }"
+          >
             <i class="fas fa-list"></i> All
           </div>
           <div
@@ -88,7 +92,7 @@
             :class="{ active: selectedCategory === category.id }"
             @click="$emit('category-change', category.id)"
           >
-            {{ getIcon(category.name) }} {{ category.name }}
+            {{ category.icon }} {{ category.name }}
             <span class="badge bg-secondary ms-2">{{ category.cardCount }}</span>
           </div>
         </div>
@@ -99,7 +103,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { Category } from '../stores/flashcardStore'
+import type { Category } from '../stores/types'
 
 interface Props {
   categories: Category[]
@@ -114,13 +118,13 @@ defineProps<Props>()
 const modes = ['normal', 'quiz', 'random']
 const filters = ['all', 'mastered', 'review']
 
-const modeIcons = {
+const modeIcons: Record<string, string> = {
   normal: '📚',
   quiz: '❓',
   random: '🔀',
 }
 
-const filterIcons = {
+const filterIcons: Record<string, string> = {
   all: '📋',
   mastered: '✨',
   review: '🔄',
@@ -129,21 +133,7 @@ const filterIcons = {
 const toggleMode = ref(true)
 const toggleFilter = ref(false)
 const toggleSettings = ref(false)
-const toggleCategories = ref(false)
-
-const getIcon = (categoryName: string): string => {
-  const icons: Record<string, string> = {
-    'JavaScript': '<i class="fab fa-js-square"></i>',
-    'Vue.js': '<i class="fab fa-vuejs"></i>',
-    'Angular': '<i class="fab fa-angular"></i>',
-    '.NET': '<i class="fas fa-hashtag"></i>',
-    'GraphQL': '<i class="fas fa-cube"></i>',
-    'Python': '<i class="fab fa-python"></i>',
-    'Java': '<i class="fab fa-java"></i>',
-    'Spring Boot': '<i class="fas fa-leaf"></i>',
-  }
-  return icons[categoryName] || '<i class="fas fa-folder"></i>'
-}
+const toggleCategories = ref(true)
 
 defineEmits(['mode-change', 'filter-change', 'category-change', 'toggle-sound'])
 </script>

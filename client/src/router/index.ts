@@ -1,7 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import FlashcardsView from '../views/FlashcardsView.vue'
-import StatsView from '../views/StatsView.vue'
+
+// Route-based code splitting: each view is a lazy chunk
+const HomeView = () => import('../views/HomeView.vue')
+const FlashcardsView = () => import('../views/FlashcardsView.vue')
+const StatsView = () => import('../views/StatsView.vue')
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -21,7 +23,14 @@ const router = createRouter({
       name: 'stats',
       component: StatsView,
     },
+    {
+      path: '/:pathMatch(.*)*',
+      redirect: '/',
+    },
   ],
+  scrollBehavior() {
+    return { top: 0 }
+  },
 })
 
 export default router

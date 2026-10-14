@@ -15,4 +15,16 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        // Keep the heavy libraries in their own cached chunks
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return
+          if (id.includes('highlight.js')) return 'highlight'
+          if (id.includes('/gsap/') || id.includes('\\gsap\\')) return 'gsap'
+        },
+      },
+    },
+  },
 })

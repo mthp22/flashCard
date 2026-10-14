@@ -1,5 +1,5 @@
 <template>
-  <div class="home-view">
+  <div class="home-view" ref="rootRef">
     <Navbar />
 
     <main class="main-content">
@@ -7,13 +7,17 @@
       <section class="hero-section container-fluid py-5">
         <div class="row align-items-center">
           <div class="col-lg-6 py-5">
-            <h1 class="display-4 fw-bold mb-4">
+            <p class="hero-eyebrow text-accent mb-3">
+              <i class="fas fa-bolt"></i> Vue · GSAP · Pinia
+            </p>
+            <h1 class="display-4 fw-bold mb-4 hero-title">
               <i class="fas fa-code text-accent"></i> Master Technical Interviews
             </h1>
-            <p class="lead mb-4">
-              Interactive flashcards with spaced repetition algorithm for JavaScript, Vue, Angular, .NET, and more.
+            <p class="lead mb-4 hero-text">
+              Interactive flashcards with spaced repetition algorithm for JavaScript, Vue, Angular,
+              .NET, and more.
             </p>
-            <div class="d-flex gap-3 flex-wrap">
+            <div class="d-flex gap-3 flex-wrap hero-actions">
               <router-link to="/flashcards" class="btn btn-primary btn-lg">
                 <i class="fas fa-play"></i> Start Studying
               </router-link>
@@ -24,24 +28,20 @@
           </div>
           <div class="col-lg-6 text-center py-5">
             <div class="hero-code">
-              <pre><code>const interview = {
-  preparation: 'thorough',
-  confidence: 'maximum',
-  success: true
-}</code></pre>
+              <pre><code><span class="code-line">const interview = {</span><span class="code-line">  preparation: 'thorough',</span><span class="code-line">  confidence: 'maximum',</span><span class="code-line">  success: true</span><span class="code-line">}</span></code></pre>
             </div>
           </div>
         </div>
       </section>
 
       <!-- Features Section -->
-      <section class="features-section container-fluid py-5 bg-code">
-        <h2 class="text-center mb-5">
+      <section class="features-section container-fluid py-5 bg-code reveal-section">
+        <h2 class="text-center mb-5 reveal-item">
           <i class="fas fa-star text-accent"></i> Why Use Our Flashcard App?
         </h2>
         <div class="row g-4">
-          <div v-for="feature in features" :key="feature.id" class="col-md-6 col-lg-4">
-            <div class="feature-card card h-100 feature-bounce">
+          <div v-for="feature in features" :key="feature.id" class="col-md-6 col-lg-4 reveal-item">
+            <div class="feature-card card h-100">
               <div class="card-body text-center">
                 <div class="feature-icon mb-3">{{ feature.icon }}</div>
                 <h5 class="card-title text-accent">{{ feature.title }}</h5>
@@ -53,12 +53,12 @@
       </section>
 
       <!-- How It Works -->
-      <section class="how-section container-fluid py-5">
-        <h2 class="text-center mb-5">
+      <section class="how-section container-fluid py-5 reveal-section">
+        <h2 class="text-center mb-5 reveal-item">
           <i class="fas fa-graduation-cap text-accent"></i> How It Works
         </h2>
         <div class="row g-4 mb-5">
-          <div v-for="(step, idx) in steps" :key="idx" class="col-md-4">
+          <div v-for="(step, idx) in steps" :key="idx" class="col-md-4 reveal-item">
             <div class="step-card card h-100">
               <div class="card-body text-center">
                 <div class="step-number">{{ idx + 1 }}</div>
@@ -71,18 +71,26 @@
       </section>
 
       <!-- Categories Preview -->
-      <section class="categories-section container-fluid py-5">
-        <h2 class="text-center mb-5">
+      <section class="categories-section container-fluid py-5 reveal-section">
+        <h2 class="text-center mb-5 reveal-item">
           <i class="fas fa-book-open text-accent"></i> Available Frameworks
         </h2>
         <div class="row g-4">
-          <div v-for="category in categories" :key="category.id" class="col-md-6 col-lg-3">
+          <div
+            v-for="category in categories"
+            :key="category.id"
+            class="col-md-6 col-lg-3 reveal-item"
+          >
             <div class="category-card card h-100 cursor-pointer" @click="startStudy(category.id)">
               <div class="card-body">
-                <h5 class="card-title">{{ getIcon(category.name) }} {{ category.name }}</h5>
+                <h5 class="card-title">{{ category.icon }} {{ category.name }}</h5>
                 <p class="text-muted small mb-3">{{ category.cardCount }} cards</p>
                 <div class="topics-list">
-                  <span v-for="topic in category.subcategories.slice(0, 3)" :key="topic" class="badge bg-secondary me-2 mb-2">
+                  <span
+                    v-for="topic in category.subcategories.slice(0, 3)"
+                    :key="topic"
+                    class="badge bg-secondary me-2 mb-2"
+                  >
                     {{ topic }}
                   </span>
                   <span v-if="category.subcategories.length > 3" class="badge bg-secondary">
@@ -101,14 +109,18 @@
       </section>
 
       <!-- CTA Section -->
-      <section class="cta-section container-fluid py-5">
+      <section class="cta-section container-fluid py-5 reveal-section">
         <div class="row justify-content-center">
           <div class="col-lg-8 text-center">
-            <h2 class="mb-4">Ready to Level Up?</h2>
-            <p class="lead mb-4">Join thousands of developers mastering technical interviews</p>
-            <router-link to="/flashcards" class="btn btn-primary btn-lg">
-              <i class="fas fa-rocket"></i> Begin Now
-            </router-link>
+            <h2 class="mb-4 reveal-item">Ready to Level Up?</h2>
+            <p class="lead mb-4 reveal-item">
+              Join thousands of developers mastering technical interviews
+            </p>
+            <div class="reveal-item">
+              <router-link to="/flashcards" class="btn btn-primary btn-lg">
+                <i class="fas fa-rocket"></i> Begin Now
+              </router-link>
+            </div>
           </div>
         </div>
       </section>
@@ -117,13 +129,19 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useFlashcardStore } from '../stores/flashcardStore'
+import { useCardsStore } from '../stores/cards'
+import { gsap } from '../plugins/gsap'
 import Navbar from '../components/Navbar.vue'
 
 const router = useRouter()
-const store = useFlashcardStore()
+const store = useCardsStore()
+const rootRef = ref<HTMLElement | null>(null)
+
+let animationContext: gsap.Context | undefined
+
+const categories = computed(() => store.categoriesWithCount)
 
 const features = [
   {
@@ -179,27 +197,57 @@ const steps = [
   },
 ]
 
-const getIcon = (name: string): string => {
-  const icons: Record<string, string> = {
-    JavaScript: '📜',
-    'Vue.js': '🟢',
-    Angular: '🔴',
-    '.NET': '🟦',
-    GraphQL: '🔸',
-    Python: '🐍',
-    Java: '☕',
-    'Spring Boot': '🍃',
-  }
-  return icons[name] || '📚'
-}
-
 const startStudy = (categoryId: string) => {
   store.setCategory(categoryId)
   router.push('/flashcards')
 }
 
-onMounted(async () => {
-  await store.fetchCategories()
+onMounted(() => {
+  store.hydrate()
+  if (!rootRef.value) return
+
+  // All animation is scoped to this view and reverted on unmount
+  animationContext = gsap.context(() => {
+    // --- Hero intro timeline ---
+    const intro = gsap.timeline({ defaults: { ease: 'power3.out' } })
+    intro
+      .from('.hero-eyebrow', { y: 20, opacity: 0, duration: 0.5 })
+      .from('.hero-title', { y: 40, opacity: 0, duration: 0.7 }, '-=0.2')
+      .from('.hero-text', { y: 30, opacity: 0, duration: 0.6 }, '-=0.4')
+      .from('.hero-actions > *', { y: 20, opacity: 0, duration: 0.5, stagger: 0.12 }, '-=0.3')
+      .from(
+        '.hero-code',
+        { x: 60, opacity: 0, rotateY: 25, duration: 0.8, ease: 'back.out(1.4)' },
+        '-=0.6',
+      )
+      .from(
+        '.code-line',
+        { opacity: 0, x: -12, duration: 0.35, stagger: 0.15, ease: 'power2.out' },
+        '-=0.4',
+      )
+
+    // --- Scroll-triggered section reveals ---
+    gsap.utils.toArray<HTMLElement>('.reveal-section').forEach((section) => {
+      const items = section.querySelectorAll('.reveal-item')
+      gsap.from(items, {
+        y: 48,
+        opacity: 0,
+        duration: 0.7,
+        stagger: 0.1,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: section,
+          start: 'top 78%',
+          once: true,
+        },
+      })
+    })
+  }, rootRef.value)
+})
+
+onBeforeUnmount(() => {
+  animationContext?.revert()
+  animationContext = undefined
 })
 </script>
 
@@ -218,6 +266,14 @@ onMounted(async () => {
   border-bottom: 2px solid var(--border);
 }
 
+.hero-eyebrow {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-size: 0.9rem;
+}
+
 .hero-code {
   background: var(--code-bg);
   border: 2px solid var(--accent);
@@ -225,12 +281,18 @@ onMounted(async () => {
   padding: 2rem;
   font-family: var(--font-mono);
   text-align: left;
+  perspective: 800px;
 }
 
 .hero-code pre {
   margin: 0;
-  color: #4ade80;
   overflow-x: auto;
+}
+
+.code-line {
+  display: block;
+  color: #4ade80;
+  min-height: 1.6em;
 }
 
 .features-section {
@@ -239,24 +301,13 @@ onMounted(async () => {
 
 .feature-card {
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition:
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
 }
 
-.feature-bounce:hover {
-  animation: bounceHover 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+.feature-card:hover {
   box-shadow: 0 20px 40px rgba(0, 212, 255, 0.2);
-}
-
-@keyframes bounceHover {
-  0% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-12px);
-  }
-  100% {
-    transform: translateY(0);
-  }
 }
 
 .feature-icon {
@@ -330,17 +381,6 @@ onMounted(async () => {
 
   .feature-icon {
     font-size: 2rem;
-  }
-
-  .categories-section .row {
-    margin-left: -0.5rem;
-    margin-right: -0.5rem;
-  }
-
-  .categories-section .col-md-6,
-  .categories-section .col-lg-3 {
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
   }
 }
 

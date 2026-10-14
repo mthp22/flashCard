@@ -1,9 +1,7 @@
 <template>
   <nav class="navbar navbar-expand-lg sticky-top">
     <div class="container-fluid">
-      <router-link to="/" class="navbar-brand">
-        <i class="fas fa-code"></i> FlashCode
-      </router-link>
+      <router-link to="/" class="navbar-brand"> <i class="fas fa-code"></i> FlashCode </router-link>
 
       <button
         class="navbar-toggler"
@@ -31,9 +29,9 @@
           <button
             @click="toggleDarkMode"
             class="btn btn-outline-light btn-sm"
-            :title="darkMode ? 'Light Mode' : 'Dark Mode'"
+            :title="isDark ? 'Light Mode' : 'Dark Mode'"
           >
-            <i :class="darkMode ? 'fas fa-sun' : 'fas fa-moon'"></i>
+            <i :class="isDark ? 'fas fa-sun' : 'fas fa-moon'"></i>
           </button>
         </div>
       </div>
@@ -42,17 +40,18 @@
 </template>
 
 <script setup lang="ts">
-import { useFlashcardStore } from '../stores/flashcardStore'
+import { computed } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useSettingsStore } from '../stores/settings'
 
-const store = useFlashcardStore()
+const settings = useSettingsStore()
+const { darkMode } = storeToRefs(settings)
 
 const toggleDarkMode = () => {
-  store.toggleDarkMode()
+  settings.toggleDarkMode()
 }
 
-const darkMode = computed(() => store.darkMode)
-
-import { computed } from 'vue'
+const isDark = computed(() => darkMode.value)
 </script>
 
 <style scoped>
