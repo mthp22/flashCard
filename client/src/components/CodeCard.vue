@@ -230,7 +230,7 @@ onBeforeUnmount(() => {
 }
 
 .difficulty-hard {
-  color: var(--accent);
+  color: var(--red);
 }
 
 .card-content {
@@ -308,13 +308,13 @@ code {
 }
 
 .btn-review {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--red);
+  color: var(--red);
   background: transparent;
 }
 
 .btn-review:hover {
-  background: var(--accent);
+  background: var(--red);
   color: var(--surface);
 }
 

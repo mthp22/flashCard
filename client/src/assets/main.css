@@ -1,9 +1,10 @@
 /* ============================================================
    Flashcard Catalog — a card-catalog design system
 
-   The metaphor: manila drawers of 3x5 index cards. Cream card
-   stock, ruled lines, red top rules, typed labels, rubber
-   stamps. Daylight by default; "dim" for late-night study.
+   The metaphor: olive-drab drawers of 3x5 index cards. Field-
+   notebook card stock, ruled lines, olive top rules, typed
+   labels, rubber stamps. Daylight by default; "dim" for night
+   operations.
 
    Legacy variable names (--code-bg, --border, --accent …) are
    kept as aliases of the new tokens so component styles read
@@ -15,29 +16,30 @@
 
 /* ------------------------------------------------------------
    Tokens — daylight (default)
-   Manila desk, bright card stock, oxblood stamp ink
+   Olive drab desk, field-notebook card stock, military green ink
    ------------------------------------------------------------ */
 :root {
   /* Paper & ink */
-  --bg: #ddd2b8; /* manila desk blotter */
-  --surface: #fbf7ec; /* bright card stock */
-  --surface-2: #efe7d2; /* kraft slips, header strips */
-  --ink: #241f17; /* warm near-black */
-  --ink-soft: #6b6154; /* annotations */
-  --rule: #c9bda0; /* ruled lines, hairlines */
+  --bg: #d5d3bd; /* olive-khaki desk canvas */
+  --surface: #f4f2e3; /* field-notebook card stock */
+  --surface-2: #e6e3cd; /* khaki slips, header strips */
+  --ink: #232718; /* dark field green-black */
+  --ink-soft: #5e6449; /* annotations */
+  --rule: #bfc0a3; /* ruled lines, hairlines */
 
   /* Ink colors */
-  --accent: #9c2f24; /* oxblood stamp ink */
-  --primary-dark: #7c241b;
-  --green: #2f6a4d; /* MASTERED stamp pad */
-  --amber: #a06f1e; /* aged brass */
-  --brass: #a8873c; /* drawer hardware */
-  --drawer: #4a3f30; /* drawer front */
-  --drawer-ink: #ece2cc; /* typed labels on drawers */
+  --accent: #4a5a2f; /* olive drab */
+  --primary-dark: #3a4724;
+  --red: #993527; /* classification-stamp red */
+  --green: #38603c; /* MASTERED stamp pad */
+  --amber: #8a7325; /* field brass */
+  --brass: #8f7f42; /* drawer hardware */
+  --drawer: #343a26; /* olive canvas drawer front */
+  --drawer-ink: #e4e2cd; /* typed labels on drawers */
 
   /* Semantic aliases used across components */
   --success: var(--green);
-  --danger: var(--accent);
+  --danger: var(--red);
   --warning: var(--amber);
   --info: var(--brass);
   --code-bg: var(--surface-2);
@@ -58,31 +60,32 @@
 
 /* ------------------------------------------------------------
    Tokens — dim (late-night desk, lamp on low)
-   Warm charcoal + parchment; accents lift to hold presence
+   Near-black olive; accents lifted for dark surfaces
    ------------------------------------------------------------ */
 :root[data-theme='dark'] {
-  --bg: #191512;
-  --surface: #241f1a;
-  --surface-2: #201b16;
-  --ink: #e6dcc6;
-  --ink-soft: #a89a84;
-  --rule: #3a3229;
+  --bg: #13150e;
+  --surface: #1c1f14;
+  --surface-2: #181b10;
+  --ink: #d9dcc0;
+  --ink-soft: #98a07b;
+  --rule: #333a24;
 
-  --accent: #d2604f;
-  --primary-dark: #b8503f;
-  --green: #7fae8e;
-  --amber: #d2a04f;
-  --brass: #c9a95f;
-  --drawer: #12100c;
-  --drawer-ink: #e6dcc6;
+  --accent: #96ab5e;
+  --primary-dark: #7d9050;
+  --red: #cf6a55;
+  --green: #7cae7e;
+  --amber: #c8ad58;
+  --brass: #b8a35a;
+  --drawer: #0e100a;
+  --drawer-ink: #d9dcc0;
 
   --lift: 0 1px 0 rgba(0, 0, 0, 0.35), 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
-/* A faint pool of lamplight over the desk in dim mode */
+/* A faint phosphor glow over the desk in dim mode */
 :root[data-theme='dark'] body {
   background:
-    radial-gradient(1200px 480px at 50% -8%, rgba(210, 160, 79, 0.07), transparent 62%), var(--bg);
+    radial-gradient(1200px 480px at 50% -8%, rgba(150, 171, 94, 0.07), transparent 62%), var(--bg);
 }
 
 /* ------------------------------------------------------------
@@ -163,7 +166,7 @@ a:hover {
 }
 
 /* ------------------------------------------------------------
-   Buttons — typed labels on paper, stamp-red primary
+   Buttons — typed labels on paper, olive-drab primary
    ------------------------------------------------------------ */
 .btn {
   font-family: var(--font-mono);
@@ -235,8 +238,8 @@ a:hover {
 }
 
 .btn-danger {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: var(--red);
+  border-color: var(--red);
   color: #faf5e9;
 }
 
@@ -268,13 +271,13 @@ a:hover {
 }
 
 .btn-outline-danger {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--red);
+  color: var(--red);
   background: transparent;
 }
 
 .btn-outline-danger:hover {
-  background: var(--accent);
+  background: var(--red);
   color: #faf5e9;
 }
 
@@ -430,7 +433,7 @@ kbd {
 }
 
 .stamp--red {
-  color: var(--accent);
+  color: var(--red);
 }
 
 .stamp--faint {
@@ -471,7 +474,7 @@ kbd {
 }
 
 .progress-bar.bg-danger {
-  background: var(--accent) !important;
+  background: var(--red) !important;
 }
 
 /* ------------------------------------------------------------
