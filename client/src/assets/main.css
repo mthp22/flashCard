@@ -1,81 +1,152 @@
-/* Import Bootstrap */
+/* ============================================================
+   Flashcard Catalog — a card-catalog design system
+
+   The metaphor: manila drawers of 3x5 index cards. Cream card
+   stock, ruled lines, red top rules, typed labels, rubber
+   stamps. Daylight by default; "dim" for late-night study.
+
+   Legacy variable names (--code-bg, --border, --accent …) are
+   kept as aliases of the new tokens so component styles read
+   in catalog tones without churn.
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
 @import 'bootstrap/dist/css/bootstrap.min.css';
 @import '@fortawesome/fontawesome-free/css/all.min.css';
-@import 'highlight.js/styles/atom-one-dark.css';
 
-/* Root Variables - Developer Theme */
+/* ------------------------------------------------------------
+   Tokens — daylight (default)
+   ------------------------------------------------------------ */
 :root {
-  --primary: #00d4ff;
-  --primary-dark: #00a8cc;
-  --secondary: #6366f1;
-  --success: #10b981;
-  --danger: #ef4444;
-  --warning: #f59e0b;
-  --info: #0ea5e9;
-  --light: #f3f4f6;
-  --dark: #0f172a;
-  --darker: #0a0e27;
-  --code-bg: #1e293b;
-  --code-text: #e2e8f0;
-  --border: #334155;
-  --accent: #00d4ff;
+  /* Paper & ink */
+  --bg: #e8dfc9; /* desk */
+  --surface: #faf5e9; /* card stock */
+  --surface-2: #f1e9d6; /* insets, header strips */
+  --ink: #2a251d; /* warm near-black */
+  --ink-soft: #6f6455; /* annotations */
+  --rule: #d8cbae; /* ruled lines, hairlines */
+
+  /* Ink colors */
+  --accent: #b03a2e; /* index-card red */
+  --primary-dark: #8c2d23;
+  --green: #2f6e4e; /* MASTERED stamp */
+  --amber: #92610f;
+  --brass: #a8873c; /* drawer hardware */
+  --drawer: #4a3f30; /* drawer front */
+  --drawer-ink: #ece2cc; /* typed labels on drawers */
+
+  /* Semantic aliases used across components */
+  --success: var(--green);
+  --danger: var(--accent);
+  --warning: var(--amber);
+  --info: var(--brass);
+  --code-bg: var(--surface-2);
+  --code-text: var(--ink);
+  --border: var(--rule);
+  --darker: var(--ink);
+  --secondary: var(--ink-soft);
 
   /* Fonts */
-  --font-mono: 'Cascadia Code', 'Courier New', monospace;
+  --font-mono: 'Courier Prime', 'Courier New', monospace;
   --font-sans:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif;
+
+  /* Paper lift — flat, no neon glows */
+  --lift: 0 1px 0 var(--rule), 0 2px 10px rgba(42, 37, 29, 0.1);
 }
 
-/* Dark mode */
-body {
-  background: linear-gradient(135deg, #0a0e27 0%, #0f172a 100%);
-  color: var(--code-text);
-  font-family: var(--font-sans);
-  min-height: 100vh;
+/* ------------------------------------------------------------
+   Tokens — dim (late-night desk lamp off)
+   ------------------------------------------------------------ */
+:root[data-theme='dark'] {
+  --bg: #211c15;
+  --surface: #2c261d;
+  --surface-2: #262019;
+  --ink: #d9cfb8;
+  --ink-soft: #9a8d75;
+  --rule: #493f2f;
+
+  --accent: #c96555;
+  --primary-dark: #b05142;
+  --green: #7fa88b;
+  --amber: #c29a52;
+  --brass: #c2a35b;
+  --drawer: #17130e;
+  --drawer-ink: #d9cfb8;
+
+  --lift: 0 1px 0 rgba(0, 0, 0, 0.35), 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
+/* ------------------------------------------------------------
+   Base
+   ------------------------------------------------------------ */
 html {
   height: 100%;
 }
 
 body {
   height: 100%;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+}
+
+/* Paper grain — sits above the desk color, below everything else */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.05'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 #app {
+  position: relative;
+  z-index: 1;
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
-/* Typography */
+::selection {
+  background: var(--accent);
+  color: var(--surface);
+}
+
+/* ------------------------------------------------------------
+   Typography — typed headings, set body
+   ------------------------------------------------------------ */
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-  color: var(--accent);
+  color: var(--ink);
+  font-family: var(--font-mono);
   font-weight: 700;
-  letter-spacing: 0.5px;
+  letter-spacing: 0;
 }
 
 code {
   font-family: var(--font-mono);
-  background: var(--code-bg);
-  border: 1px solid var(--border);
-  color: #4ade80;
-  border-radius: 4px;
-  padding: 2px 6px;
+  background: var(--surface-2);
+  border: 1px solid var(--rule);
+  color: var(--accent);
+  border-radius: 2px;
+  padding: 1px 5px;
   font-size: 0.9em;
 }
 
-/* Links */
 a {
   color: var(--accent);
   text-decoration: none;
-  transition: all 0.3s ease;
+  transition: color 0.2s ease;
 }
 
 a:hover {
@@ -83,309 +154,509 @@ a:hover {
   text-decoration: underline;
 }
 
-/* Buttons */
+/* ------------------------------------------------------------
+   Buttons — typed labels on paper, stamp-red primary
+   ------------------------------------------------------------ */
 .btn {
   font-family: var(--font-mono);
-  font-weight: 600;
-  border-radius: 6px;
-  border: 2px solid transparent;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: 3px;
+  border: 1.5px solid var(--ink);
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+  letter-spacing: 0.3px;
+  font-size: 0.9rem;
+  padding: 0.45rem 1.1rem;
+  box-shadow: none;
 }
 
 .btn-primary {
   background: var(--accent);
-  color: var(--darker);
   border-color: var(--accent);
+  color: #faf5e9;
 }
 
-.btn-primary:hover {
+.btn-primary:hover,
+.btn-primary:focus {
   background: var(--primary-dark);
   border-color: var(--primary-dark);
-  color: var(--darker);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(0, 212, 255, 0.3);
+  color: #faf5e9;
 }
 
 .btn-secondary {
-  background: var(--code-bg);
-  color: var(--accent);
-  border-color: var(--accent);
+  background: var(--surface-2);
+  border-color: var(--ink);
+  color: var(--ink);
 }
 
 .btn-secondary:hover {
-  background: var(--accent);
-  color: var(--darker);
-  transform: translateY(-2px);
+  background: var(--ink);
+  color: var(--surface);
 }
 
+/* prev/next + quiet controls */
 .btn-outline-light {
-  border-color: var(--accent);
-  color: var(--accent);
+  background: transparent;
+  border-color: var(--ink);
+  color: var(--ink);
 }
 
 .btn-outline-light:hover {
-  background: var(--accent);
-  color: var(--darker);
+  background: var(--ink);
+  color: var(--surface);
 }
 
-/* Cards */
+.btn-outline-light:disabled {
+  opacity: 0.35;
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--rule);
+}
+
+.btn-success {
+  background: var(--green);
+  border-color: var(--green);
+  color: #faf5e9;
+}
+
+.btn-success:hover {
+  filter: brightness(0.92);
+  color: #faf5e9;
+}
+
+.btn-danger {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #faf5e9;
+}
+
+.btn-danger:hover {
+  filter: brightness(0.92);
+  color: #faf5e9;
+}
+
+.btn-warning {
+  background: var(--amber);
+  border-color: var(--amber);
+  color: #faf5e9;
+}
+
+.btn-warning:hover {
+  filter: brightness(0.92);
+  color: #faf5e9;
+}
+
+.btn-info {
+  background: var(--brass);
+  border-color: var(--brass);
+  color: #221c12;
+}
+
+.btn-info:hover {
+  filter: brightness(0.92);
+  color: #221c12;
+}
+
+.btn-outline-danger {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: transparent;
+}
+
+.btn-outline-danger:hover {
+  background: var(--accent);
+  color: #faf5e9;
+}
+
+.btn-group .btn {
+  border-radius: 0;
+}
+
+.btn-group .btn:first-child {
+  border-radius: 3px 0 0 3px;
+}
+
+.btn-group .btn:last-child {
+  border-radius: 0 3px 3px 0;
+}
+
+.btn-group .btn:not(:last-child) {
+  border-right-width: 0;
+}
+
+/* ------------------------------------------------------------
+   Surfaces
+   ------------------------------------------------------------ */
 .card {
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  transition: all 0.3s ease;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  box-shadow: var(--lift);
+  transition: border-color 0.2s ease;
 }
 
 .card:hover {
-  border-color: var(--accent);
-  box-shadow: 0 0 20px rgba(0, 212, 255, 0.15);
-  transform: translateY(-4px);
+  border-color: var(--ink-soft);
 }
 
 .card-header {
-  background: var(--code-bg);
-  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--rule);
+  border-radius: 3px 3px 0 0 !important;
+  color: var(--ink);
 }
 
 .card-body {
-  color: var(--code-text);
+  color: var(--ink);
 }
 
-/* Forms */
+.card-footer {
+  background: var(--surface-2) !important;
+  border-top: 1px solid var(--rule) !important;
+  color: var(--ink-soft);
+}
+
+/* ------------------------------------------------------------
+   Forms — typed on the card
+   ------------------------------------------------------------ */
 .form-control,
 .form-select {
-  background: var(--code-bg);
-  border: 1px solid var(--border);
-  color: var(--code-text);
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  color: var(--ink);
   font-family: var(--font-mono);
 }
 
 .form-control:focus,
 .form-select:focus {
-  background: var(--code-bg);
+  background: var(--surface);
   border-color: var(--accent);
-  color: var(--code-text);
-  box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+  color: var(--ink);
+  box-shadow: none;
+  outline: none;
 }
 
-/* Badge */
+.form-control::placeholder {
+  color: var(--ink-soft);
+  opacity: 0.7;
+}
+
+.form-label {
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.form-select option {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+/* ------------------------------------------------------------
+   Badges, kbd, stamps
+   ------------------------------------------------------------ */
 .badge {
   font-family: var(--font-mono);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  border-radius: 2px;
+  font-size: 0.7rem;
 }
 
-/* Progress Bar */
+.badge.bg-secondary {
+  background: var(--surface-2) !important;
+  color: var(--ink-soft) !important;
+  border: 1px solid var(--rule);
+}
+
+.badge.bg-dark {
+  background: var(--drawer) !important;
+  color: var(--drawer-ink) !important;
+}
+
+.badge.bg-info {
+  background: transparent !important;
+  color: var(--accent) !important;
+  border: 1px solid var(--accent);
+}
+
+.badge.bg-warning {
+  background: transparent !important;
+  color: var(--amber) !important;
+  border: 1px solid var(--amber);
+}
+
+kbd {
+  font-family: var(--font-mono);
+  background: var(--surface-2);
+  border: 1px solid var(--rule);
+  border-bottom-width: 2px;
+  border-radius: 3px;
+  color: var(--ink);
+  font-size: 0.72rem;
+  padding: 1px 5px;
+}
+
+/* Rubber stamp — the catalog's status language */
+.stamp {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 0.75rem;
+  border: 2px solid currentColor;
+  border-radius: 3px;
+  padding: 0.2rem 0.55rem;
+  transform: rotate(-4deg);
+  opacity: 0.9;
+}
+
+.stamp--green {
+  color: var(--green);
+}
+
+.stamp--red {
+  color: var(--accent);
+}
+
+.stamp--faint {
+  opacity: 0.45;
+}
+
+/* Typed serial numbers */
+.serial {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 1px;
+  color: var(--ink-soft);
+}
+
+/* ------------------------------------------------------------
+   Progress — an inked bar on a ruled track
+   ------------------------------------------------------------ */
 .progress {
-  background: var(--code-bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  height: 28px;
+  background: var(--surface-2);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
 }
 
 .progress-bar {
-  background: linear-gradient(90deg, var(--accent) 0%, var(--secondary) 100%);
+  background: var(--ink);
   font-family: var(--font-mono);
   font-weight: 700;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
+  color: var(--surface);
 }
 
-/* Scrollbar */
+.progress-bar.bg-success {
+  background: var(--green) !important;
+}
+
+.progress-bar.bg-warning {
+  background: var(--amber) !important;
+}
+
+.progress-bar.bg-danger {
+  background: var(--accent) !important;
+}
+
+/* ------------------------------------------------------------
+   Navbar — catalog name plate over a ruled strip
+   ------------------------------------------------------------ */
+.navbar {
+  background: var(--surface);
+  border-bottom: 3px double var(--rule);
+  padding: 0.65rem 1rem;
+}
+
+.navbar-brand {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--ink) !important;
+  font-size: 1.25rem;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.brand-serial {
+  font-size: 0.7rem;
+  letter-spacing: 1px;
+  color: var(--ink-soft);
+}
+
+.nav-link {
+  color: var(--ink) !important;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  padding: 0.35rem 0.6rem !important;
+  border-radius: 2px;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.nav-link:hover {
+  background: var(--surface-2);
+  color: var(--accent) !important;
+  text-decoration: none;
+}
+
+.nav-link.active {
+  color: var(--accent) !important;
+}
+
+/* ------------------------------------------------------------
+   Sidebar — a drawer front with typed label strips
+   ------------------------------------------------------------ */
+.sidebar {
+  background: var(--drawer);
+  color: var(--drawer-ink);
+  border-right: 1px solid var(--rule);
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+}
+
+.collapse-header {
+  background: color-mix(in srgb, var(--drawer) 82%, #ffffff 18%);
+  border-color: color-mix(in srgb, var(--drawer) 60%, #000000 40%);
+  color: var(--drawer-ink);
+}
+
+.collapse-header:hover {
+  background: color-mix(in srgb, var(--drawer) 72%, #ffffff 28%);
+  border-color: var(--brass);
+}
+
+.tree-item {
+  color: color-mix(in srgb, var(--drawer-ink) 80%, var(--drawer) 20%);
+  border-left: 3px solid transparent;
+}
+
+.tree-item:hover {
+  background: color-mix(in srgb, var(--drawer) 85%, #ffffff 15%);
+  color: var(--drawer-ink);
+}
+
+.tree-item.active {
+  background: color-mix(in srgb, var(--drawer) 88%, #ffffff 12%);
+  border-left-color: var(--brass);
+  color: #ffffff;
+}
+
+/* ------------------------------------------------------------
+   Scrollbar
+   ------------------------------------------------------------ */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--code-bg);
+  background: var(--surface-2);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border);
+  background: var(--rule);
   border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--accent);
+  background: var(--ink-soft);
 }
 
-/* Navbar */
-.navbar {
-  background: linear-gradient(90deg, #0f172a 0%, #1e293b 100%);
-  border-bottom: 2px solid var(--border);
-  backdrop-filter: blur(10px);
-}
-
-.navbar-brand {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  color: var(--accent) !important;
-  font-size: 1.5rem;
-  letter-spacing: 2px;
-}
-
-.nav-link {
-  color: var(--code-text) !important;
-  font-family: var(--font-mono);
-  font-weight: 600;
-  text-transform: uppercase;
-  font-size: 0.9rem;
-  letter-spacing: 1px;
-  transition: color 0.3s ease;
-}
-
-.nav-link:hover {
-  color: var(--accent) !important;
-}
-
-/* Sidebar */
-.sidebar {
-  background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
-  border-right: 2px solid var(--border);
-  max-height: calc(100vh - 80px);
-  overflow-y: auto;
-}
-
-.sidebar-item {
-  padding: 1rem;
-  border-bottom: 1px solid var(--border);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-family: var(--font-mono);
-}
-
-.sidebar-item:hover,
-.sidebar-item.active {
-  background: var(--code-bg);
-  color: var(--accent);
-  border-left: 4px solid var(--accent);
-  padding-left: calc(1rem - 4px);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .sidebar {
-    max-height: none;
-  }
-
-  .container-fluid {
-    padding: 1rem 0.5rem;
-  }
-
-  h1 {
-    font-size: 1.5rem;
-  }
-
-  h2 {
-    font-size: 1.25rem;
-  }
-
-  .btn {
-    font-size: 0.8rem;
-    padding: 0.5rem 1rem;
-  }
-}
-
-/* Animation utilities */
-.fade-in {
-  animation: fadeIn 0.5s ease-in;
-}
-
-.slide-in {
-  animation: slideIn 0.5s ease-in;
-}
-
-.bounce-in {
-  animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideIn {
-  from {
-    transform: translateX(-20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-@keyframes bounceIn {
-  0% {
-    transform: scale(0.9);
-    opacity: 0;
-  }
-  50% {
-    transform: scale(1.05);
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-/* Highlight.js custom styling */
+/* ------------------------------------------------------------
+   Highlight.js — typed ink on card stock
+   ------------------------------------------------------------ */
 .hljs {
-  background: var(--code-bg);
-  color: var(--code-text);
-  border-radius: 8px;
-  padding: 1rem;
-  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--ink);
+  border-radius: 0;
+  padding: 0;
+  border: none;
   font-family: var(--font-mono);
   font-size: 0.9rem;
   line-height: 1.6;
 }
 
-.hljs-string {
-  color: #4ade80;
+.hljs-string,
+.hljs-meta .hljs-string {
+  color: var(--green);
 }
 
 .hljs-number {
-  color: #fbbf24;
+  color: var(--amber);
 }
 
 .hljs-literal {
-  color: #f472b6;
+  color: var(--accent);
 }
 
-.hljs-attr {
-  color: #60a5fa;
-}
-
-.hljs-variable {
-  color: #22d3ee;
-}
-
-.hljs-function {
-  color: #f87171;
-}
-
-.hljs-title {
-  color: #00d4ff;
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-built_in {
+  color: var(--accent);
   font-weight: 700;
 }
 
-/* Utility classes */
+.hljs-attr,
+.hljs-attribute,
+.hljs-property {
+  color: var(--brass);
+}
+
+.hljs-variable,
+.hljs-template-variable {
+  color: var(--ink);
+}
+
+.hljs-function,
+.hljs-title,
+.hljs-section {
+  color: var(--primary-dark);
+  font-weight: 700;
+}
+
+.hljs-comment {
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
+.hljs-tag {
+  color: var(--ink-soft);
+}
+
+/* ------------------------------------------------------------
+   Utilities
+   ------------------------------------------------------------ */
 .text-accent {
   color: var(--accent);
 }
 
-/* Bootstrap's muted grey is unreadable on the dark theme */
+.text-success {
+  color: var(--green) !important;
+}
+
+.text-warning {
+  color: var(--amber) !important;
+}
+
+.text-danger {
+  color: var(--accent) !important;
+}
+
+.text-info {
+  color: var(--brass) !important;
+}
+
 .text-muted {
-  color: #94a3b8 !important;
+  color: var(--ink-soft) !important;
 }
 
 .border-accent {
@@ -393,12 +664,12 @@ a:hover {
 }
 
 .bg-code {
-  background: var(--code-bg);
+  background: var(--surface-2);
 }
 
 .text-mono {
   font-family: var(--font-mono);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 /* Tree view */
@@ -408,24 +679,16 @@ a:hover {
 }
 
 .tree-item {
-  padding: 0.75rem 1rem;
-  border-left: 2px solid transparent;
+  padding: 0.6rem 1rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background 0.2s ease;
   font-family: var(--font-mono);
   font-size: 0.9rem;
 }
 
-.tree-item:hover,
-.tree-item.active {
-  border-left-color: var(--accent);
-  background: rgba(0, 212, 255, 0.1);
-  color: var(--accent);
-}
-
 .tree-item--nested {
   padding-left: 2rem;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
 }
 
 /* Collapsible */
@@ -436,17 +699,11 @@ a:hover {
   align-items: center;
   gap: 0.5rem;
   font-family: var(--font-mono);
-  font-weight: 600;
-  padding: 1rem;
+  font-weight: 700;
+  padding: 0.7rem 1rem;
   border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--code-bg);
-  transition: all 0.3s ease;
-}
-
-.collapse-header:hover {
-  background: rgba(0, 212, 255, 0.1);
-  border-color: var(--accent);
+  border-radius: 3px;
+  transition: background 0.2s ease;
 }
 
 .collapse-icon {
@@ -473,26 +730,83 @@ a:hover {
   }
 }
 
-/* Feature cards hover animations */
-.feature-card {
-  transition: all 0.3s ease;
-  cursor: pointer;
+/* Ruled index-card lines — text should sit on the 28px grid */
+.ruled {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 27px,
+    var(--rule) 27px,
+    var(--rule) 28px
+  );
 }
 
-.feature-card:hover {
-  animation: bounce 0.6s ease-in-out;
-  transform: translateY(-8px);
-  box-shadow: 0 20px 40px rgba(0, 212, 255, 0.2);
+/* ------------------------------------------------------------
+   Animation utilities
+   ------------------------------------------------------------ */
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
 }
 
-@keyframes bounce {
-  0%,
-  100% {
-    transform: translateY(0);
+@keyframes fadeIn {
+  from {
+    opacity: 0;
   }
-  50% {
-    transform: translateY(-12px);
+  to {
+    opacity: 1;
   }
+}
+
+/* ------------------------------------------------------------
+   Responsive
+   ------------------------------------------------------------ */
+@media (max-width: 768px) {
+  .sidebar {
+    max-height: none;
+  }
+
+  .container-fluid {
+    padding: 1rem 0.5rem;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+  }
+
+  .btn {
+    font-size: 0.82rem;
+    padding: 0.4rem 0.9rem;
+  }
+}
+
+/* Landscape orientation */
+@media (max-height: 600px) and (orientation: landscape) {
+  .navbar {
+    padding: 0.4rem 0.5rem;
+  }
+
+  .navbar-brand {
+    font-size: 1.1rem;
+  }
+
+  .nav-link {
+    font-size: 0.8rem;
+    padding: 0.25rem 0.5rem !important;
+  }
+
+  .sidebar {
+    max-height: calc(100vh - 60px);
+  }
+}
+
+/* Focus visible for accessibility */
+*:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 /* Print styles */
@@ -508,142 +822,4 @@ a:hover {
     background: white;
     color: black;
   }
-}
-
-/* Landscape orientation */
-@media (max-height: 600px) and (orientation: landscape) {
-  .navbar {
-    padding: 0.5rem 0;
-  }
-
-  .navbar-brand {
-    font-size: 1.2rem;
-  }
-
-  .nav-link {
-    font-size: 0.8rem;
-    padding: 0.3rem 0.5rem !important;
-  }
-
-  .sidebar {
-    max-height: calc(100vh - 60px);
-  }
-
-  .container-fluid {
-    padding: 0.5rem;
-  }
-
-  main {
-    padding: 0.5rem;
-  }
-}
-
-/* Focus visible for accessibility */
-*:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-/* =========================================================
-   Light theme — applied via <html data-theme="light">
-   (toggled by the settings store). Overrides both the root
-   variables and hardcoded dark surfaces in scoped styles.
-   ========================================================= */
-:root[data-theme='light'] {
-  --code-bg: #ffffff;
-  --code-text: #1f2937;
-  --border: #cbd5e1;
-  --darker: #0f172a;
-}
-
-:root[data-theme='light'] body {
-  background: #f1f5f9;
-  color: var(--code-text);
-}
-
-:root[data-theme='light'] h1,
-:root[data-theme='light'] h2,
-:root[data-theme='light'] h3,
-:root[data-theme='light'] h4,
-:root[data-theme='light'] h5,
-:root[data-theme='light'] h6 {
-  color: #0369a1;
-}
-
-:root[data-theme='light'] .card {
-  background: #ffffff;
-}
-
-:root[data-theme='light'] .card-header {
-  background: #f8fafc;
-}
-
-:root[data-theme='light'] .navbar {
-  background: rgba(255, 255, 255, 0.95);
-}
-
-:root[data-theme='light'] .sidebar {
-  background: #f8fafc;
-}
-
-:root[data-theme='light'] .nav-link {
-  color: #1f2937 !important;
-}
-
-:root[data-theme='light'] code {
-  background: #f1f5f9;
-  color: #15803d;
-}
-
-:root[data-theme='light'] .hljs {
-  background: #f8fafc;
-  color: #1f2937;
-}
-
-/* --- Component surfaces with hardcoded dark gradients --- */
-
-:root[data-theme='light'] .card-side {
-  background: #ffffff;
-  border-color: #e2e8f0;
-}
-
-:root[data-theme='light'] .code-line {
-  color: #15803d;
-}
-
-:root[data-theme='light'] .progress-card,
-:root[data-theme='light'] .card-row,
-:root[data-theme='light'] .card-modal {
-  background: #ffffff;
-}
-
-:root[data-theme='light'] .stat-label {
-  color: #64748b;
-}
-
-:root[data-theme='light'] .stats-view,
-:root[data-theme='light'] .cta-section {
-  background: #f1f5f9;
-}
-
-:root[data-theme='light'] .stats-view code {
-  background: #f1f5f9;
-  color: #15803d;
-}
-
-:root[data-theme='light'] .hint {
-  color: #64748b;
-}
-
-:root[data-theme='light'] .card-modal {
-  border-color: var(--accent);
-  box-shadow: 0 30px 60px rgba(15, 23, 42, 0.2);
-}
-
-:root[data-theme='light'] .modal-backdrop {
-  background: rgba(15, 23, 42, 0.45);
-}
-
-:root[data-theme='light'] .text-muted {
-  color: #64748b !important;
 }

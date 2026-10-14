@@ -12,7 +12,7 @@ export const SEED_CATEGORIES: Category[] = [
   {
     id: 'javascript',
     name: 'JavaScript',
-    icon: '📜',
+    icon: 'fab fa-js',
     subcategories: [
       'Variables',
       'Functions',
@@ -28,7 +28,7 @@ export const SEED_CATEGORIES: Category[] = [
   {
     id: 'vue',
     name: 'Vue.js',
-    icon: '🟢',
+    icon: 'fab fa-vuejs',
     subcategories: [
       'Components',
       'Lifecycle',
@@ -43,42 +43,42 @@ export const SEED_CATEGORIES: Category[] = [
   {
     id: 'angular',
     name: 'Angular',
-    icon: '🔴',
+    icon: 'fab fa-angular',
     subcategories: ['Components', 'Services', 'RxJS', 'Decorators', 'Routing', 'Forms'],
     cardCount: 0,
   },
   {
     id: 'dotnet',
     name: '.NET',
-    icon: '🟦',
+    icon: 'fas fa-hashtag',
     subcategories: ['C# Basics', 'OOP', 'LINQ', 'Async/Await', 'Entity Framework', 'SOLID'],
     cardCount: 0,
   },
   {
     id: 'graphql',
     name: 'GraphQL',
-    icon: '🔸',
+    icon: 'fas fa-project-diagram',
     subcategories: ['Queries', 'Mutations', 'Subscriptions', 'Schema', 'Resolvers'],
     cardCount: 0,
   },
   {
     id: 'python',
     name: 'Python',
-    icon: '🐍',
+    icon: 'fab fa-python',
     subcategories: ['Basics', 'OOP', 'Decorators', 'Generators', 'Async', 'Django'],
     cardCount: 0,
   },
   {
     id: 'java',
     name: 'Java',
-    icon: '☕',
+    icon: 'fab fa-java',
     subcategories: ['OOP', 'Collections', 'Generics', 'Streams', 'Concurrency', 'JUnit'],
     cardCount: 0,
   },
   {
     id: 'spring',
     name: 'Spring Boot',
-    icon: '🍃',
+    icon: 'fas fa-leaf',
     subcategories: ['Annotations', 'Dependency Injection', 'REST', 'Data JPA', 'Security'],
     cardCount: 0,
   },

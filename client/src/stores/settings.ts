@@ -13,7 +13,8 @@ let audioContext: AudioContext | null = null
  */
 export const useSettingsStore = defineStore('settings', {
   state: () => ({
-    darkMode: true,
+    // Paper is the default; dim is the late-night mode
+    darkMode: false,
     soundEnabled: true,
   }),
 
