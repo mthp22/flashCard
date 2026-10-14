@@ -23,6 +23,14 @@ export default defineConfigWithVueTs(
   vueTsConfigs.recommended,
 
   {
+    // Navbar/Sidebar are idiomatic single-word names for these primitives
+    files: ['src/components/*.vue'],
+    rules: {
+      'vue/multi-word-component-names': 'off',
+    },
+  },
+
+  {
     ...pluginPlaywright.configs['flat/recommended'],
     files: ['e2e/**/*.{test,spec}.{js,ts,jsx,tsx}'],
   },
